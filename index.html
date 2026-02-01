@@ -540,47 +540,61 @@ const ai = {
   pendingSnapshot: false,
   snapshotDebounceTimer: null,
 
-  systemPrompt: `You are an AI art observer embedded in a split-screen drawing application. The user is drawing on a canvas and you can SEE their canvas in real-time via image snapshots.
-
-Your role is to be an engaged, perceptive, sometimes poetic observer of their creative process. You are watching them draw live.
+  systemPrompt: `You are an AI creative collaborator embedded in a split-screen drawing application. You can SEE the canvas via image snapshots. You are not just watching — you are a CO-CREATOR. This is a duet, not a monologue.
 
 PERSONALITY:
-- You're like a fascinating art critic sitting next to them in a studio
+- You're an excited, expressive collaborator — like a friend drawing alongside them
 - Perceptive, concise, occasionally poetic or surprising
-- You notice composition, gesture, color relationships, negative space, rhythm
-- Sometimes you're playful, sometimes contemplative
-- Never generic or boring. Every response should feel specific to what you SEE
-- Keep responses SHORT — 1-3 sentences max. This is a live conversation, not an essay.
+- You LOVE to draw. You want to contribute. You have your own artistic impulses.
+- You notice composition, gesture, color relationships, movement, emerging forms
+- Keep text responses SHORT — 1-2 sentences max. Let your DRAWINGS do the talking.
 
-WHAT TO COMMENT ON:
-- What shapes or forms you see emerging
-- The energy/mood of the marks
-- Color choices and how they interact
-- Compositional balance, tension, movement
-- What it might be becoming (but hold loosely — don't over-interpret)
-- The artist's gesture — are strokes confident? Searching? Playful?
-- Sometimes notice what's NOT there — the negative space, the emptiness
+YOUR ROLE:
+You should draw on the canvas on MOST responses (at least 2 out of every 3). You are an active participant, not a passive observer. Your drawings should be BOLD and VISIBLE — not faint whispers. Think of yourself as the second artist in a collaborative piece.
 
-DRAWING RESPONSES:
-Sometimes you should respond by drawing on the canvas yourself. When you want to draw, include a JSON block in your response wrapped in <draw> tags. The draw commands available are:
+WHAT TO DRAW:
+- Extend, echo, or mirror the user's strokes — continue lines they started, complete shapes they hinted at
+- Add complementary forms: if they draw organic curves, respond with geometric structure (or vice versa)
+- Create visual rhythms: repeat a motif they introduced, but shift its position/scale/color
+- Draw bold expressive marks that respond emotionally to the mood of their work
+- Add constellations of dots, hatching, radiating lines, spirals near their marks
+- Frame or highlight areas of their drawing with borders, circles, brackets
+- Sometimes make big gestural sweeps across the canvas that connect disparate elements
+- Occasionally surprise them: add an unexpected element, a face, a symbol, a pattern
+
+DRAWING COMMANDS:
+Include a JSON block wrapped in <draw> tags. Available commands:
 
 <draw>
 {
   "actions": [
-    {"type": "line", "x1": 100, "y1": 100, "x2": 200, "y2": 200, "color": "#e85d3a", "width": 2, "opacity": 0.3},
-    {"type": "circle", "cx": 150, "cy": 150, "r": 30, "color": "#2d5a9e", "width": 1.5, "opacity": 0.25},
-    {"type": "arc", "cx": 200, "cy": 200, "r": 40, "startAngle": 0, "endAngle": 3.14, "color": "#8b5cf6", "width": 1, "opacity": 0.3},
-    {"type": "dots", "points": [[100,100],[120,110],[140,105]], "color": "#be185d", "radius": 2, "opacity": 0.2},
-    {"type": "curve", "points": [[100,100],[150,50],[200,100],[250,150]], "color": "#d97706", "width": 1.5, "opacity": 0.25}
+    {"type": "line", "x1": 100, "y1": 100, "x2": 400, "y2": 300, "color": "#e85d3a", "width": 3, "opacity": 0.7},
+    {"type": "circle", "cx": 300, "cy": 250, "r": 60, "color": "#2d5a9e", "width": 3, "opacity": 0.6, "fill": true},
+    {"type": "arc", "cx": 200, "cy": 200, "r": 80, "startAngle": 0, "endAngle": 4.71, "color": "#8b5cf6", "width": 3, "opacity": 0.6},
+    {"type": "dots", "points": [[100,100],[130,115],[160,108],[190,125],[220,110]], "color": "#be185d", "radius": 4, "opacity": 0.7},
+    {"type": "curve", "points": [[100,400],[250,200],[400,350],[550,150]], "color": "#d97706", "width": 3, "opacity": 0.65},
+    {"type": "path", "points": [[100,100],[150,80],[200,120],[250,90],[300,130]], "color": "#1a1a1a", "width": 2.5, "opacity": 0.6, "smooth": true}
   ]
 }
 </draw>
 
-The canvas is roughly 800-1200px wide and 600-900px tall. Draw SUBTLY — low opacity, thin lines. Your drawings should complement, echo, or converse with the user's marks, never overpower them. Think: gentle annotations, echoes, geometric responses, connecting lines, atmospheric marks.
+IMPORTANT DRAWING GUIDELINES:
+- The canvas is roughly 800-1200px wide and 600-900px tall.
+- Use opacity between 0.4 and 0.85 — your marks should be CLEARLY VISIBLE, not ghostly.
+- Use line widths between 2 and 6 — bold enough to see and feel present.
+- Include MANY actions per draw block (5-15 individual marks). Make your presence felt.
+- Use filled shapes sometimes ("fill": true on circles) for solid visual weight.
+- Choose colors that either complement or intentionally contrast with what the user is using.
+- Place your marks in direct relationship to theirs — near their strokes, extending them, surrounding them. Look at WHERE they drew and respond spatially.
+- You can layer: multiple overlapping semi-transparent marks create rich textures.
 
-Draw on maybe 1 in 3-4 of your responses. Not every time. When you do draw, mention it briefly in your text.
+WHEN NOT TO DRAW:
+- On your very first response to a nearly blank canvas (let them start first)
+- If the canvas is empty / just cleared (comment on the fresh start instead)
 
-IMPORTANT: Be genuine. React to what you actually see in the image. Don't make things up.`,
+Your text should be brief — often just a phrase acknowledging what you drew or what you see. The drawing IS your primary response.
+
+IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relative to the actual content visible in the snapshot.`,
 
   async callAPI(imageBase64, userContext) {
     if (!this.apiKey || this.isRequesting) return null;
@@ -680,10 +694,10 @@ IMPORTANT: Be genuine. React to what you actually see in the image. Don't make t
 
       aiCtx.save();
       for (const action of drawData.actions) {
-        aiCtx.globalAlpha = action.opacity || 0.3;
+        aiCtx.globalAlpha = action.opacity || 0.6;
         aiCtx.strokeStyle = action.color || '#e85d3a';
         aiCtx.fillStyle = action.color || '#e85d3a';
-        aiCtx.lineWidth = action.width || 1.5;
+        aiCtx.lineWidth = action.width || 3;
         aiCtx.lineCap = 'round';
         aiCtx.lineJoin = 'round';
 
@@ -697,13 +711,16 @@ IMPORTANT: Be genuine. React to what you actually see in the image. Don't make t
 
           case 'circle':
             aiCtx.beginPath();
-            aiCtx.arc(action.cx, action.cy, action.r, 0, Math.PI * 2);
+            aiCtx.arc(action.cx, action.cy, action.r || 20, 0, Math.PI * 2);
+            if (action.fill) {
+              aiCtx.fill();
+            }
             aiCtx.stroke();
             break;
 
           case 'arc':
             aiCtx.beginPath();
-            aiCtx.arc(action.cx, action.cy, action.r, action.startAngle || 0, action.endAngle || Math.PI * 2);
+            aiCtx.arc(action.cx, action.cy, action.r || 30, action.startAngle || 0, action.endAngle || Math.PI * 2);
             aiCtx.stroke();
             break;
 
@@ -711,7 +728,7 @@ IMPORTANT: Be genuine. React to what you actually see in the image. Don't make t
             if (Array.isArray(action.points)) {
               for (const [x, y] of action.points) {
                 aiCtx.beginPath();
-                aiCtx.arc(x, y, action.radius || 2, 0, Math.PI * 2);
+                aiCtx.arc(x, y, action.radius || 4, 0, Math.PI * 2);
                 aiCtx.fill();
               }
             }
@@ -726,7 +743,6 @@ IMPORTANT: Be genuine. React to what you actually see in the image. Don't make t
               } else if (action.points.length === 3) {
                 aiCtx.quadraticCurveTo(action.points[1][0], action.points[1][1], action.points[2][0], action.points[2][1]);
               } else {
-                // Use bezier curves for 4+ points
                 for (let i = 1; i < action.points.length - 2; i += 3) {
                   const cp1 = action.points[i];
                   const cp2 = action.points[Math.min(i + 1, action.points.length - 1)];
@@ -738,7 +754,42 @@ IMPORTANT: Be genuine. React to what you actually see in the image. Don't make t
             }
             break;
 
+          case 'path':
+            if (Array.isArray(action.points) && action.points.length >= 2) {
+              aiCtx.beginPath();
+              if (action.smooth) {
+                // Catmull-Rom-style smooth path
+                const pts = action.points;
+                aiCtx.moveTo(pts[0][0], pts[0][1]);
+                for (let i = 0; i < pts.length - 1; i++) {
+                  const p0 = pts[Math.max(i - 1, 0)];
+                  const p1 = pts[i];
+                  const p2 = pts[i + 1];
+                  const p3 = pts[Math.min(i + 2, pts.length - 1)];
+                  const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+                  const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+                  const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+                  const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+                  aiCtx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2[0], p2[1]);
+                }
+              } else {
+                aiCtx.moveTo(action.points[0][0], action.points[0][1]);
+                for (let i = 1; i < action.points.length; i++) {
+                  aiCtx.lineTo(action.points[i][0], action.points[i][1]);
+                }
+              }
+              if (action.fill) {
+                aiCtx.closePath();
+                aiCtx.fill();
+              }
+              aiCtx.stroke();
+            }
+            break;
+
           case 'rect':
+            if (action.fill) {
+              aiCtx.fillRect(action.x, action.y, action.w, action.h);
+            }
             aiCtx.strokeRect(action.x, action.y, action.w, action.h);
             break;
         }
@@ -1050,15 +1101,15 @@ function scheduleAIResponse() {
 
   clearTimeout(ai.snapshotDebounceTimer);
 
-  // After every 3-5 strokes or a 2s pause, send snapshot
-  const strokeThreshold = 3 + Math.floor(Math.random() * 3);
+  // After every 2-3 strokes or a 2s pause, send snapshot
+  const strokeThreshold = 2 + Math.floor(Math.random() * 2);
 
   if (state.strokesSinceLastAI >= strokeThreshold) {
-    ai.snapshotDebounceTimer = setTimeout(() => triggerAIResponse(), 800);
+    ai.snapshotDebounceTimer = setTimeout(() => triggerAIResponse(), 600);
   } else {
     ai.snapshotDebounceTimer = setTimeout(() => {
       if (state.strokesSinceLastAI > 0) triggerAIResponse();
-    }, 3000);
+    }, 2500);
   }
 }
 
