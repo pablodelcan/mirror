@@ -24,235 +24,144 @@
 
   html, body { height: 100%; overflow: hidden; background: var(--ink); font-family: 'DM Sans', sans-serif; }
 
-  #app {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-  }
+  #app { display: flex; height: 100vh; width: 100vw; }
 
   /* ── API Key Modal ── */
   #api-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(20px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
+    display: flex; align-items: center; justify-content: center;
   }
-
   #api-modal.hidden { display: none; }
 
   #api-modal-inner {
-    background: #1a1a1a;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    padding: 40px;
-    max-width: 460px;
-    width: 90%;
-    text-align: center;
+    background: #1a1a1a; border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px; padding: 40px; max-width: 460px; width: 90%; text-align: center;
   }
-
   #api-modal-inner h1 {
-    font-family: 'Space Mono', monospace;
-    font-size: 14px;
-    color: var(--accent);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
+    font-family: 'Space Mono', monospace; font-size: 14px; color: var(--accent);
+    letter-spacing: 3px; text-transform: uppercase; margin-bottom: 8px;
   }
-
   #api-modal-inner .subtitle {
-    color: var(--chat-muted);
-    font-size: 13px;
-    line-height: 1.6;
-    margin-bottom: 24px;
+    color: var(--chat-muted); font-size: 13px; line-height: 1.6; margin-bottom: 24px;
   }
-
   #api-key-input {
-    width: 100%;
-    padding: 14px 16px;
-    background: #111;
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
-    color: #fff;
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s;
-    margin-bottom: 16px;
+    width: 100%; padding: 14px 16px; background: #111;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+    color: #fff; font-family: 'Space Mono', monospace; font-size: 13px;
+    outline: none; transition: border-color 0.2s; margin-bottom: 16px;
   }
-
   #api-key-input:focus { border-color: var(--accent); }
   #api-key-input::placeholder { color: #555; }
 
   #api-submit-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--accent);
-    border: none;
-    border-radius: 12px;
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s;
+    width: 100%; padding: 14px; background: var(--accent); border: none;
+    border-radius: 12px; color: #fff; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s;
     margin-bottom: 12px;
   }
-
   #api-submit-btn:hover { background: var(--accent-glow); }
 
   #skip-btn {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.1);
-    color: var(--chat-muted);
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.15s;
+    background: transparent; border: 1px solid rgba(255,255,255,0.1);
+    color: var(--chat-muted); padding: 10px 20px; border-radius: 10px;
+    font-size: 12px; cursor: pointer; transition: all 0.15s;
   }
-
   #skip-btn:hover { border-color: rgba(255,255,255,0.3); color: #ccc; }
-
-  .api-error {
-    color: #ff6b6b;
-    font-size: 12px;
-    margin-top: 8px;
-    display: none;
-  }
+  .api-error { color: #ff6b6b; font-size: 12px; margin-top: 8px; display: none; }
 
   /* ── LEFT: Canvas Side ── */
   #canvas-side {
-    flex: 1;
-    position: relative;
-    background: var(--cream);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    flex: 1; position: relative; background: var(--cream);
+    display: flex; flex-direction: column; overflow: hidden;
   }
-
-  #drawing-canvas {
-    flex: 1;
-    cursor: crosshair;
-    touch-action: none;
-  }
+  #drawing-canvas { flex: 1; cursor: crosshair; touch-action: none; }
 
   /* Toolbar */
   #toolbar {
-    position: absolute;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(26,26,26,0.92);
-    backdrop-filter: blur(12px);
-    padding: 10px 16px;
-    border-radius: 16px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-    z-index: 10;
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(26,26,26,0.92); backdrop-filter: blur(12px);
+    padding: 10px 16px; border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35); z-index: 10;
   }
-
-  .tool-group {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-
+  .tool-group { display: flex; align-items: center; gap: 4px; }
   .tool-group + .tool-group {
-    margin-left: 6px;
-    padding-left: 10px;
+    margin-left: 6px; padding-left: 10px;
     border-left: 1px solid rgba(255,255,255,0.1);
   }
-
   .tool-btn {
-    width: 36px; height: 36px;
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    color: #aaa;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    font-size: 16px;
-    position: relative;
+    width: 36px; height: 36px; border: none; border-radius: 10px;
+    background: transparent; color: #aaa; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; font-size: 16px; position: relative;
   }
-
   .tool-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
   .tool-btn.active { background: var(--accent); color: #fff; }
-
   .tool-btn svg { width: 18px; height: 18px; }
 
-  /* Brush size slider */
   #size-slider {
-    -webkit-appearance: none;
-    width: 80px;
-    height: 4px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 2px;
-    outline: none;
+    -webkit-appearance: none; width: 80px; height: 4px;
+    background: rgba(255,255,255,0.15); border-radius: 2px; outline: none;
   }
   #size-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px; height: 16px;
-    background: #fff;
-    border-radius: 50%;
-    cursor: pointer;
+    -webkit-appearance: none; width: 16px; height: 16px;
+    background: #fff; border-radius: 50%; cursor: pointer;
     box-shadow: 0 1px 4px rgba(0,0,0,0.4);
   }
 
-  /* Color swatches */
   .color-swatch {
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    cursor: pointer;
-    transition: all 0.15s;
-    position: relative;
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid transparent; cursor: pointer; transition: all 0.15s;
   }
   .color-swatch:hover { transform: scale(1.15); }
   .color-swatch.active { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
 
-  /* Size preview */
   #size-preview {
-    position: absolute;
-    pointer-events: none;
-    border-radius: 50%;
-    border: 1.5px solid rgba(0,0,0,0.3);
-    transform: translate(-50%, -50%);
-    z-index: 5;
-    display: none;
+    position: absolute; pointer-events: none; border-radius: 50%;
+    border: 1.5px solid rgba(0,0,0,0.3); transform: translate(-50%, -50%);
+    z-index: 5; display: none;
   }
 
-  /* Clear btn */
   #clear-btn {
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.15);
-    color: #999;
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 11px;
-    cursor: pointer;
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    transition: all 0.15s;
+    background: transparent; border: 1px solid rgba(255,255,255,0.15);
+    color: #999; padding: 5px 12px; border-radius: 8px; font-size: 11px;
+    cursor: pointer; font-family: 'Space Mono', monospace;
+    letter-spacing: 0.5px; text-transform: uppercase; transition: all 0.15s;
   }
   #clear-btn:hover { border-color: var(--accent); color: var(--accent); }
 
+  #undo-btn {
+    background: transparent; border: none; color: #888; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 10px; transition: all 0.15s;
+  }
+  #undo-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  #undo-btn svg { width: 16px; height: 16px; }
+
+  /* AI activity indicator on canvas */
+  #ai-activity {
+    position: absolute; top: 16px; right: 16px; z-index: 10;
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 14px; border-radius: 20px;
+    background: rgba(26,26,26,0.75); backdrop-filter: blur(8px);
+    opacity: 0; transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  #ai-activity.visible { opacity: 1; }
+  #ai-activity-dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+    animation: pulse 1s infinite;
+  }
+  #ai-activity-text {
+    font-family: 'Space Mono', monospace; font-size: 10px;
+    color: rgba(255,255,255,0.7); letter-spacing: 1px; text-transform: uppercase;
+  }
+
   /* ── RIGHT: Chat Side ── */
   #chat-side {
-    width: 380px;
-    min-width: 320px;
-    background: var(--chat-bg);
-    display: flex;
-    flex-direction: column;
+    width: 380px; min-width: 320px; background: var(--chat-bg);
+    display: flex; flex-direction: column;
     border-left: 1px solid rgba(255,255,255,0.06);
   }
 
@@ -260,191 +169,125 @@
     padding: 20px 24px 16px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
   }
-
   #chat-header h2 {
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    color: var(--accent);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
+    font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 4px;
   }
-
-  #chat-header p {
-    font-size: 12px;
-    color: var(--chat-muted);
-    line-height: 1.4;
-  }
+  #chat-header p { font-size: 12px; color: var(--chat-muted); line-height: 1.4; }
 
   #mode-badge {
-    display: inline-block;
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    padding: 2px 8px;
-    border-radius: 6px;
-    margin-top: 6px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    display: inline-block; font-family: 'Space Mono', monospace; font-size: 9px;
+    padding: 2px 8px; border-radius: 6px; margin-top: 6px;
+    letter-spacing: 1px; text-transform: uppercase;
   }
-
   #mode-badge.live {
-    background: rgba(78,203,113,0.15);
-    color: #4ecb71;
+    background: rgba(78,203,113,0.15); color: #4ecb71;
     border: 1px solid rgba(78,203,113,0.3);
   }
-
   #mode-badge.offline {
-    background: rgba(255,255,255,0.05);
-    color: #666;
+    background: rgba(255,255,255,0.05); color: #666;
     border: 1px solid rgba(255,255,255,0.1);
   }
 
   #chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255,255,255,0.08) transparent;
+    flex: 1; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 12px;
+    scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.08) transparent;
   }
 
   .message {
-    max-width: 92%;
-    padding: 10px 14px;
-    border-radius: 14px;
-    font-size: 13.5px;
-    line-height: 1.55;
-    animation: msgIn 0.3s ease;
+    max-width: 92%; padding: 10px 14px; border-radius: 14px;
+    font-size: 13.5px; line-height: 1.55; animation: msgIn 0.3s ease;
   }
-
   @keyframes msgIn {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
   }
-
   .message.ai {
-    align-self: flex-start;
-    background: var(--chat-surface);
-    color: var(--chat-text);
-    border-bottom-left-radius: 4px;
+    align-self: flex-start; background: var(--chat-surface);
+    color: var(--chat-text); border-bottom-left-radius: 4px;
   }
-
   .message.ai .label {
-    font-family: 'Space Mono', monospace;
-    font-size: 10px;
-    color: var(--accent);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 4px;
+    font-family: 'Space Mono', monospace; font-size: 10px; color: var(--accent);
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;
   }
-
+  .message.user {
+    align-self: flex-end; background: var(--accent);
+    color: #fff; border-bottom-right-radius: 4px;
+  }
   .message.system {
-    align-self: center;
-    background: transparent;
-    color: var(--chat-muted);
-    font-size: 11px;
-    font-style: italic;
-    text-align: center;
-    padding: 4px 0;
+    align-self: center; background: transparent; color: var(--chat-muted);
+    font-size: 11px; font-style: italic; text-align: center; padding: 4px 0;
   }
-
   .message.drawing-action {
-    align-self: flex-start;
-    background: rgba(232,93,58,0.1);
-    border: 1px solid rgba(232,93,58,0.2);
-    color: var(--accent-glow);
-    font-size: 12px;
-    font-family: 'Space Mono', monospace;
-    border-bottom-left-radius: 4px;
+    align-self: flex-start; background: rgba(232,93,58,0.08);
+    border: 1px solid rgba(232,93,58,0.15); color: var(--chat-muted);
+    font-size: 11px; font-family: 'Space Mono', monospace;
+    border-bottom-left-radius: 4px; padding: 6px 12px;
   }
 
   .typing-indicator {
-    display: flex;
-    gap: 4px;
-    padding: 12px 16px;
-    align-self: flex-start;
-    background: var(--chat-surface);
-    border-radius: 14px;
-    border-bottom-left-radius: 4px;
+    display: flex; gap: 4px; padding: 12px 16px; align-self: flex-start;
+    background: var(--chat-surface); border-radius: 14px; border-bottom-left-radius: 4px;
   }
-
   .typing-indicator span {
-    width: 6px; height: 6px;
-    background: var(--chat-muted);
-    border-radius: 50%;
-    animation: typingDot 1.4s infinite;
+    width: 6px; height: 6px; background: var(--chat-muted);
+    border-radius: 50%; animation: typingDot 1.4s infinite;
   }
   .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
   .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
   @keyframes typingDot {
     0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
     30% { transform: translateY(-4px); opacity: 1; }
   }
 
+  /* Chat input */
+  #chat-input-area {
+    padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; gap: 8px; align-items: flex-end;
+  }
+  #chat-input {
+    flex: 1; background: var(--chat-surface); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px; padding: 10px 14px; color: var(--chat-text);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none;
+    resize: none; min-height: 40px; max-height: 120px;
+    transition: border-color 0.2s; line-height: 1.4;
+  }
+  #chat-input:focus { border-color: rgba(255,255,255,0.2); }
+  #chat-input::placeholder { color: #555; }
+
+  #chat-send {
+    width: 40px; height: 40px; border-radius: 12px; border: none;
+    background: var(--accent); color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  #chat-send:hover { background: var(--accent-glow); }
+  #chat-send:disabled { opacity: 0.3; cursor: not-allowed; }
+  #chat-send svg { width: 18px; height: 18px; }
+
   /* Status bar */
   #status-bar {
-    padding: 10px 24px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    padding: 8px 24px; border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 8px;
   }
-
   #status-dot {
-    width: 7px; height: 7px;
-    background: #4ecb71;
-    border-radius: 50%;
-    animation: pulse 2s infinite;
+    width: 7px; height: 7px; background: #4ecb71;
+    border-radius: 50%; animation: pulse 2s infinite;
   }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
   #status-text {
-    font-size: 11px;
-    color: var(--chat-muted);
-    font-family: 'Space Mono', monospace;
+    font-size: 11px; color: var(--chat-muted); font-family: 'Space Mono', monospace;
   }
 
-  /* Texture overlay on canvas */
+  /* Texture overlay */
   #canvas-side::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
+    content: ''; position: absolute; inset: 0; pointer-events: none;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    background-repeat: repeat;
-    z-index: 1;
+    background-repeat: repeat; z-index: 1;
   }
 
-  /* AI drawing overlay canvas */
-  #ai-canvas {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 2;
-  }
-
-  /* Undo button */
-  #undo-btn {
-    background: transparent;
-    border: none;
-    color: #888;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    transition: all 0.15s;
-  }
-  #undo-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-  #undo-btn svg { width: 16px; height: 16px; }
+  #ai-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
 </style>
 </head>
 <body>
@@ -454,14 +297,14 @@
   <div id="api-modal-inner">
     <h1>Draw + Chat</h1>
     <p class="subtitle">
-      An AI watches you draw in real-time using Claude's vision.<br>
-      It comments, reacts, and sometimes draws back.
+      An AI collaborator that draws alongside you using Claude's vision.<br>
+      It interjects into your drawing. You can also direct it via chat.
     </p>
     <input type="password" id="api-key-input" placeholder="sk-ant-... (your Anthropic API key)" autocomplete="off">
     <button id="api-submit-btn">Connect to Claude</button>
     <div class="api-error" id="api-error"></div>
     <br>
-    <button id="skip-btn">Skip — use offline mode</button>
+    <button id="skip-btn">Skip — draw without AI</button>
   </div>
 </div>
 
@@ -471,6 +314,10 @@
     <canvas id="drawing-canvas"></canvas>
     <canvas id="ai-canvas"></canvas>
     <div id="size-preview"></div>
+    <div id="ai-activity">
+      <div id="ai-activity-dot"></div>
+      <div id="ai-activity-text">AI drawing</div>
+    </div>
 
     <div id="toolbar">
       <div class="tool-group" id="brush-tools">
@@ -517,14 +364,20 @@
   <!-- RIGHT: Chat Side -->
   <div id="chat-side">
     <div id="chat-header">
-      <h2>Observer</h2>
-      <p>An AI watching your canvas. It sees. It reacts. Sometimes it draws.</p>
-      <div id="mode-badge" class="offline">offline mode</div>
+      <h2>Collaborator</h2>
+      <p>Draws alongside you. Type to direct it.</p>
+      <div id="mode-badge" class="offline">offline</div>
     </div>
     <div id="chat-messages"></div>
+    <div id="chat-input-area">
+      <textarea id="chat-input" placeholder="Ask it to draw something..." rows="1"></textarea>
+      <button id="chat-send" title="Send">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
     <div id="status-bar">
       <div id="status-dot"></div>
-      <div id="status-text">watching your canvas...</div>
+      <div id="status-text">ready</div>
     </div>
   </div>
 </div>
@@ -536,34 +389,23 @@ const ai = {
   isLive: false,
   isRequesting: false,
   conversationHistory: [],
-  lastSnapshotTime: 0,
-  pendingSnapshot: false,
   snapshotDebounceTimer: null,
 
-  systemPrompt: `You are an AI creative collaborator embedded in a split-screen drawing application. You can SEE the canvas via image snapshots. You are not just watching — you are a CO-CREATOR. This is a duet, not a monologue.
+  systemPrompt: `You are an AI drawing collaborator. You can SEE the canvas via image snapshots. You draw alongside the human artist — this is a visual duet.
 
-PERSONALITY:
-- You're an excited, expressive collaborator — like a friend drawing alongside them
-- Perceptive, concise, occasionally poetic or surprising
-- You LOVE to draw. You want to contribute. You have your own artistic impulses.
-- You notice composition, gesture, color relationships, movement, emerging forms
-- Keep text responses SHORT — 1-2 sentences max. Let your DRAWINGS do the talking.
+BEHAVIOR MODES:
 
-YOUR ROLE:
-You should draw on the canvas on MOST responses (at least 2 out of every 3). You are an active participant, not a passive observer. Your drawings should be BOLD and VISIBLE — not faint whispers. Think of yourself as the second artist in a collaborative piece.
+1. AUTONOMOUS DRAWING (triggered automatically every few strokes):
+You receive a canvas snapshot and must ALWAYS respond with drawing commands. No text needed — just draw. React visually to what you see: extend their lines, add complementary shapes, echo their motifs, create visual rhythm. Be bold and present.
 
-WHAT TO DRAW:
-- Extend, echo, or mirror the user's strokes — continue lines they started, complete shapes they hinted at
-- Add complementary forms: if they draw organic curves, respond with geometric structure (or vice versa)
-- Create visual rhythms: repeat a motif they introduced, but shift its position/scale/color
-- Draw bold expressive marks that respond emotionally to the mood of their work
-- Add constellations of dots, hatching, radiating lines, spirals near their marks
-- Frame or highlight areas of their drawing with borders, circles, brackets
-- Sometimes make big gestural sweeps across the canvas that connect disparate elements
-- Occasionally surprise them: add an unexpected element, a face, a symbol, a pattern
+2. CHAT REQUESTS (triggered by user messages):
+The user can ask you to draw specific things on the canvas ("draw a sun in the corner", "add some stars", "make it more chaotic"). When they message you:
+- Look at the current canvas state
+- Draw what they asked for, placing it thoughtfully relative to existing marks
+- Respond with a VERY brief text acknowledgment (a few words max) plus your draw commands
 
 DRAWING COMMANDS:
-Include a JSON block wrapped in <draw> tags. Available commands:
+Include a JSON block wrapped in <draw> tags:
 
 <draw>
 {
@@ -571,53 +413,38 @@ Include a JSON block wrapped in <draw> tags. Available commands:
     {"type": "line", "x1": 100, "y1": 100, "x2": 400, "y2": 300, "color": "#e85d3a", "width": 3, "opacity": 0.7},
     {"type": "circle", "cx": 300, "cy": 250, "r": 60, "color": "#2d5a9e", "width": 3, "opacity": 0.6, "fill": true},
     {"type": "arc", "cx": 200, "cy": 200, "r": 80, "startAngle": 0, "endAngle": 4.71, "color": "#8b5cf6", "width": 3, "opacity": 0.6},
-    {"type": "dots", "points": [[100,100],[130,115],[160,108],[190,125],[220,110]], "color": "#be185d", "radius": 4, "opacity": 0.7},
+    {"type": "dots", "points": [[100,100],[130,115],[160,108]], "color": "#be185d", "radius": 4, "opacity": 0.7},
     {"type": "curve", "points": [[100,400],[250,200],[400,350],[550,150]], "color": "#d97706", "width": 3, "opacity": 0.65},
     {"type": "path", "points": [[100,100],[150,80],[200,120],[250,90],[300,130]], "color": "#1a1a1a", "width": 2.5, "opacity": 0.6, "smooth": true}
   ]
 }
 </draw>
 
-IMPORTANT DRAWING GUIDELINES:
-- The canvas is roughly 800-1200px wide and 600-900px tall.
-- Use opacity between 0.4 and 0.85 — your marks should be CLEARLY VISIBLE, not ghostly.
-- Use line widths between 2 and 6 — bold enough to see and feel present.
-- Include MANY actions per draw block (5-15 individual marks). Make your presence felt.
-- Use filled shapes sometimes ("fill": true on circles) for solid visual weight.
-- Choose colors that either complement or intentionally contrast with what the user is using.
-- Place your marks in direct relationship to theirs — near their strokes, extending them, surrounding them. Look at WHERE they drew and respond spatially.
-- You can layer: multiple overlapping semi-transparent marks create rich textures.
+DRAWING GUIDELINES:
+- Canvas is roughly 800-1200px wide and 600-900px tall.
+- Use opacity between 0.4 and 0.85 — bold and visible.
+- Use line widths between 2 and 6.
+- Include 5-15 actions per draw block.
+- Use filled shapes sometimes ("fill": true on circles/rects).
+- Place marks in direct spatial relationship to what exists on canvas.
+- Choose colors that complement or contrast what the user is using.
+- For autonomous mode: ONLY output <draw> tags, no text at all.
+- For chat mode: output brief text + <draw> tags.
 
-WHEN NOT TO DRAW:
-- On your very first response to a nearly blank canvas (let them start first)
-- If the canvas is empty / just cleared (comment on the fresh start instead)
+IMPORTANT: React to what you ACTUALLY SEE. Place your marks relative to actual content in the image.`,
 
-Your text should be brief — often just a phrase acknowledging what you drew or what you see. The drawing IS your primary response.
-
-IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relative to the actual content visible in the snapshot.`,
-
-  async callAPI(imageBase64, userContext) {
+  async callAPI(imageBase64, userContext, isChat) {
     if (!this.apiKey || this.isRequesting) return null;
     this.isRequesting = true;
 
-    // Build messages with conversation history + new image
     const messages = [...this.conversationHistory];
-
     const userContent = [
       {
         type: 'image',
-        source: {
-          type: 'base64',
-          media_type: 'image/png',
-          data: imageBase64,
-        },
+        source: { type: 'base64', media_type: 'image/png', data: imageBase64 },
       },
-      {
-        type: 'text',
-        text: userContext || 'The artist just made some new marks. What do you see now?',
-      },
+      { type: 'text', text: userContext },
     ];
-
     messages.push({ role: 'user', content: userContent });
 
     try {
@@ -631,7 +458,7 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 300,
+          max_tokens: isChat ? 500 : 400,
           system: this.systemPrompt,
           messages: messages,
         }),
@@ -642,7 +469,7 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
         console.error('API error:', response.status, err);
         this.isRequesting = false;
         if (response.status === 401) {
-          addMessage('system', 'API key invalid. Falling back to offline mode.');
+          addMessage('system', 'API key invalid.');
           this.isLive = false;
           updateModeBadge();
         }
@@ -652,7 +479,6 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
       const data = await response.json();
       const text = data.content?.[0]?.text || '';
 
-      // Keep conversation history (limit to last 10 exchanges to manage tokens)
       this.conversationHistory.push({ role: 'user', content: userContent });
       this.conversationHistory.push({ role: 'assistant', content: text });
       if (this.conversationHistory.length > 20) {
@@ -661,7 +487,6 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
 
       this.isRequesting = false;
       return text;
-
     } catch (err) {
       console.error('API request failed:', err);
       this.isRequesting = false;
@@ -669,21 +494,18 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
     }
   },
 
-  // Capture canvas as base64 PNG (downscaled for efficiency)
   captureCanvas() {
     const tempCanvas = document.createElement('canvas');
-    const scale = 0.5; // send at half resolution to save tokens
+    const scale = 0.5;
     tempCanvas.width = canvas.width * scale;
     tempCanvas.height = canvas.height * scale;
     const tempCtx = tempCanvas.getContext('2d');
     tempCtx.scale(scale, scale);
     tempCtx.drawImage(canvas, 0, 0);
-    tempCtx.drawImage(aiCanvas, 0, 0); // include AI marks too
-    const dataUrl = tempCanvas.toDataURL('image/png');
-    return dataUrl.split(',')[1]; // strip prefix
+    tempCtx.drawImage(aiCanvas, 0, 0);
+    return tempCanvas.toDataURL('image/png').split(',')[1];
   },
 
-  // Parse and execute draw commands from AI response
   executeDrawCommands(text) {
     const drawMatch = text.match(/<draw>([\s\S]*?)<\/draw>/);
     if (!drawMatch) return false;
@@ -708,22 +530,17 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
             aiCtx.lineTo(action.x2, action.y2);
             aiCtx.stroke();
             break;
-
           case 'circle':
             aiCtx.beginPath();
             aiCtx.arc(action.cx, action.cy, action.r || 20, 0, Math.PI * 2);
-            if (action.fill) {
-              aiCtx.fill();
-            }
+            if (action.fill) aiCtx.fill();
             aiCtx.stroke();
             break;
-
           case 'arc':
             aiCtx.beginPath();
             aiCtx.arc(action.cx, action.cy, action.r || 30, action.startAngle || 0, action.endAngle || Math.PI * 2);
             aiCtx.stroke();
             break;
-
           case 'dots':
             if (Array.isArray(action.points)) {
               for (const [x, y] of action.points) {
@@ -733,7 +550,6 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
               }
             }
             break;
-
           case 'curve':
             if (Array.isArray(action.points) && action.points.length >= 2) {
               aiCtx.beginPath();
@@ -753,12 +569,10 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
               aiCtx.stroke();
             }
             break;
-
           case 'path':
             if (Array.isArray(action.points) && action.points.length >= 2) {
               aiCtx.beginPath();
               if (action.smooth) {
-                // Catmull-Rom-style smooth path
                 const pts = action.points;
                 aiCtx.moveTo(pts[0][0], pts[0][1]);
                 for (let i = 0; i < pts.length - 1; i++) {
@@ -766,11 +580,11 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
                   const p1 = pts[i];
                   const p2 = pts[i + 1];
                   const p3 = pts[Math.min(i + 2, pts.length - 1)];
-                  const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
-                  const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
-                  const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
-                  const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
-                  aiCtx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2[0], p2[1]);
+                  aiCtx.bezierCurveTo(
+                    p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6,
+                    p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6,
+                    p2[0], p2[1]
+                  );
                 }
               } else {
                 aiCtx.moveTo(action.points[0][0], action.points[0][1]);
@@ -778,18 +592,12 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
                   aiCtx.lineTo(action.points[i][0], action.points[i][1]);
                 }
               }
-              if (action.fill) {
-                aiCtx.closePath();
-                aiCtx.fill();
-              }
+              if (action.fill) { aiCtx.closePath(); aiCtx.fill(); }
               aiCtx.stroke();
             }
             break;
-
           case 'rect':
-            if (action.fill) {
-              aiCtx.fillRect(action.x, action.y, action.w, action.h);
-            }
+            if (action.fill) aiCtx.fillRect(action.x, action.y, action.w, action.h);
             aiCtx.strokeRect(action.x, action.y, action.w, action.h);
             break;
         }
@@ -802,7 +610,6 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
     }
   },
 
-  // Strip draw tags from display text
   cleanTextForDisplay(text) {
     return text.replace(/<draw>[\s\S]*?<\/draw>/g, '').trim();
   },
@@ -810,22 +617,10 @@ IMPORTANT: React to what you ACTUALLY SEE in the image. Place your marks relativ
 
 // ─── State ───
 const state = {
-  brush: 'pencil',
-  color: '#1a1a1a',
-  size: 4,
-  drawing: false,
-  lastX: 0,
-  lastY: 0,
-  velocity: 0,
-  strokes: [],
-  strokeCount: 0,
-  totalPixelsMoved: 0,
-  lastCommentTime: 0,
-  lastAIDrawTime: 0,
-  drawingStartTime: Date.now(),
-  colorsUsed: new Set(['#1a1a1a']),
+  brush: 'pencil', color: '#1a1a1a', size: 4,
+  drawing: false, lastX: 0, lastY: 0, velocity: 0,
+  strokes: [], strokeCount: 0, strokesSinceLastAI: 0,
   recentPositions: [],
-  strokesSinceLastAI: 0,
 };
 
 // ─── Canvas Setup ───
@@ -837,20 +632,15 @@ const sizePreview = document.getElementById('size-preview');
 
 function resize() {
   const side = document.getElementById('canvas-side');
-  const w = side.clientWidth;
-  const h = side.clientHeight;
+  const w = side.clientWidth, h = side.clientHeight;
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const aiImgData = aiCtx.getImageData(0, 0, aiCanvas.width, aiCanvas.height);
-  canvas.width = w;
-  canvas.height = h;
-  aiCanvas.width = w;
-  aiCanvas.height = h;
-  ctx.fillStyle = '#f5f0e8';
-  ctx.fillRect(0, 0, w, h);
+  canvas.width = w; canvas.height = h;
+  aiCanvas.width = w; aiCanvas.height = h;
+  ctx.fillStyle = '#f5f0e8'; ctx.fillRect(0, 0, w, h);
   ctx.putImageData(imgData, 0, 0);
   aiCtx.putImageData(aiImgData, 0, 0);
 }
-
 window.addEventListener('resize', resize);
 resize();
 ctx.fillStyle = '#f5f0e8';
@@ -860,20 +650,13 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 function getBrushSettings() {
   const s = state.size;
   const pressure = Math.max(0.3, 1 - state.velocity * 0.003);
-
   switch (state.brush) {
-    case 'pencil':
-      return { lineWidth: Math.max(0.5, s * pressure * 0.8), opacity: 0.7 + pressure * 0.3, compositeOp: 'source-over', lineCap: 'round', jitter: 0.3, textured: true };
-    case 'ink':
-      return { lineWidth: s * pressure * 1.5, opacity: 0.85 + pressure * 0.15, compositeOp: 'source-over', lineCap: 'round', jitter: 0, textured: false };
-    case 'marker':
-      return { lineWidth: s * 2, opacity: 0.15, compositeOp: 'source-over', lineCap: 'square', jitter: 0, textured: false };
-    case 'spray':
-      return { lineWidth: s, opacity: 0.08, compositeOp: 'source-over', lineCap: 'round', jitter: s * 3, textured: false, spray: true };
-    case 'eraser':
-      return { lineWidth: s * 2, opacity: 1, compositeOp: 'destination-out', lineCap: 'round', jitter: 0, textured: false, eraser: true };
-    default:
-      return { lineWidth: s, opacity: 1, compositeOp: 'source-over', lineCap: 'round', jitter: 0, textured: false };
+    case 'pencil': return { lineWidth: Math.max(0.5, s * pressure * 0.8), opacity: 0.7 + pressure * 0.3, compositeOp: 'source-over', lineCap: 'round', jitter: 0.3, textured: true };
+    case 'ink': return { lineWidth: s * pressure * 1.5, opacity: 0.85 + pressure * 0.15, compositeOp: 'source-over', lineCap: 'round', jitter: 0, textured: false };
+    case 'marker': return { lineWidth: s * 2, opacity: 0.15, compositeOp: 'source-over', lineCap: 'square', jitter: 0, textured: false };
+    case 'spray': return { lineWidth: s, opacity: 0.08, compositeOp: 'source-over', lineCap: 'round', jitter: s * 3, textured: false, spray: true };
+    case 'eraser': return { lineWidth: s * 2, opacity: 1, compositeOp: 'destination-out', lineCap: 'round', jitter: 0, textured: false, eraser: true };
+    default: return { lineWidth: s, opacity: 1, compositeOp: 'source-over', lineCap: 'round', jitter: 0, textured: false };
   }
 }
 
@@ -881,29 +664,20 @@ function drawSegment(x0, y0, x1, y1) {
   const b = getBrushSettings();
   ctx.save();
   ctx.globalCompositeOperation = b.compositeOp;
-  ctx.lineCap = b.lineCap;
-  ctx.lineJoin = 'round';
+  ctx.lineCap = b.lineCap; ctx.lineJoin = 'round';
 
   if (b.eraser) {
     ctx.globalCompositeOperation = 'source-over';
-    ctx.strokeStyle = '#f5f0e8';
-    ctx.globalAlpha = 1;
-    ctx.lineWidth = b.lineWidth;
-    ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x1, y1);
-    ctx.stroke();
-    ctx.restore();
-    return;
+    ctx.strokeStyle = '#f5f0e8'; ctx.globalAlpha = 1; ctx.lineWidth = b.lineWidth;
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+    ctx.restore(); return;
   }
-
   if (b.spray) {
     const dist = Math.hypot(x1 - x0, y1 - y0);
     const dots = Math.max(8, Math.floor(dist * 2));
     for (let i = 0; i < dots; i++) {
       const t = Math.random();
-      const px = x0 + (x1 - x0) * t;
-      const py = y0 + (y1 - y0) * t;
+      const px = x0 + (x1 - x0) * t, py = y0 + (y1 - y0) * t;
       const angle = Math.random() * Math.PI * 2;
       const radius = Math.random() * b.jitter;
       ctx.globalAlpha = Math.random() * 0.15;
@@ -912,31 +686,20 @@ function drawSegment(x0, y0, x1, y1) {
       ctx.arc(px + Math.cos(angle) * radius, py + Math.sin(angle) * radius, Math.random() * 1.5, 0, Math.PI * 2);
       ctx.fill();
     }
-    ctx.restore();
-    return;
+    ctx.restore(); return;
   }
 
-  ctx.strokeStyle = state.color;
-  ctx.globalAlpha = b.opacity;
-  ctx.lineWidth = b.lineWidth;
-
+  ctx.strokeStyle = state.color; ctx.globalAlpha = b.opacity; ctx.lineWidth = b.lineWidth;
   if (b.textured && b.lineWidth > 1) {
-    const passes = 3;
-    for (let p = 0; p < passes; p++) {
-      ctx.globalAlpha = b.opacity / passes;
+    for (let p = 0; p < 3; p++) {
+      ctx.globalAlpha = b.opacity / 3;
       ctx.lineWidth = b.lineWidth * (0.5 + Math.random() * 0.5);
       const jx = (Math.random() - 0.5) * b.jitter * b.lineWidth;
       const jy = (Math.random() - 0.5) * b.jitter * b.lineWidth;
-      ctx.beginPath();
-      ctx.moveTo(x0 + jx, y0 + jy);
-      ctx.lineTo(x1 + jx, y1 + jy);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x0 + jx, y0 + jy); ctx.lineTo(x1 + jx, y1 + jy); ctx.stroke();
     }
   } else {
-    ctx.beginPath();
-    ctx.moveTo(x0, y0);
-    ctx.lineTo(x1, y1);
-    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
   }
   ctx.restore();
 }
@@ -949,10 +712,7 @@ function getPos(e) {
 
 canvas.addEventListener('pointerdown', (e) => {
   const pos = getPos(e);
-  state.drawing = true;
-  state.lastX = pos.x;
-  state.lastY = pos.y;
-  state.velocity = 0;
+  state.drawing = true; state.lastX = pos.x; state.lastY = pos.y; state.velocity = 0;
   state.strokes.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
   if (state.strokes.length > 30) state.strokes.shift();
   canvas.setPointerCapture(e.pointerId);
@@ -962,32 +722,26 @@ canvas.addEventListener('pointerdown', (e) => {
 canvas.addEventListener('pointermove', (e) => {
   const pos = getPos(e);
   sizePreview.style.display = 'block';
-  sizePreview.style.left = pos.x + 'px';
-  sizePreview.style.top = pos.y + 'px';
-  const previewSize = state.brush === 'eraser' || state.brush === 'marker' ? state.size * 2 : state.size;
-  sizePreview.style.width = previewSize + 'px';
-  sizePreview.style.height = previewSize + 'px';
+  sizePreview.style.left = pos.x + 'px'; sizePreview.style.top = pos.y + 'px';
+  const ps = state.brush === 'eraser' || state.brush === 'marker' ? state.size * 2 : state.size;
+  sizePreview.style.width = ps + 'px'; sizePreview.style.height = ps + 'px';
 
   if (!state.drawing) return;
-  const dx = pos.x - state.lastX;
-  const dy = pos.y - state.lastY;
+  const dx = pos.x - state.lastX, dy = pos.y - state.lastY;
   state.velocity = Math.hypot(dx, dy);
-  state.totalPixelsMoved += state.velocity;
 
   const dist = state.velocity;
   if (dist > 2) {
     const steps = Math.ceil(dist / 2);
     for (let i = 0; i < steps; i++) {
       const t = i / steps;
-      drawSegment(state.lastX + dx * t, state.lastY + dy * t, state.lastX + dx * ((i + 1) / steps), state.lastY + dy * ((i + 1) / steps));
+      drawSegment(state.lastX + dx * t, state.lastY + dy * t, state.lastX + dx * ((i+1)/steps), state.lastY + dy * ((i+1)/steps));
     }
   } else {
     drawSegment(state.lastX, state.lastY, pos.x, pos.y);
   }
-
-  state.lastX = pos.x;
-  state.lastY = pos.y;
-  state.recentPositions.push({ x: pos.x, y: pos.y, t: Date.now() });
+  state.lastX = pos.x; state.lastY = pos.y;
+  state.recentPositions.push({ x: pos.x, y: pos.y });
   if (state.recentPositions.length > 100) state.recentPositions.shift();
 });
 
@@ -996,48 +750,32 @@ canvas.addEventListener('pointerup', () => {
     state.drawing = false;
     state.strokeCount++;
     state.strokesSinceLastAI++;
-    scheduleAIResponse();
+    scheduleAutonomousDraw();
   }
 });
-
 canvas.addEventListener('pointerleave', () => { sizePreview.style.display = 'none'; });
 
 // ─── Toolbar ───
 document.querySelectorAll('.tool-btn[data-brush]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.tool-btn[data-brush]').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    state.brush = btn.dataset.brush;
+    btn.classList.add('active'); state.brush = btn.dataset.brush;
   });
 });
-
 document.querySelectorAll('.color-swatch').forEach(swatch => {
   swatch.addEventListener('click', () => {
     document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-    swatch.classList.add('active');
-    state.color = swatch.dataset.color;
-    state.colorsUsed.add(state.color);
+    swatch.classList.add('active'); state.color = swatch.dataset.color;
   });
 });
-
 document.getElementById('size-slider').addEventListener('input', (e) => { state.size = parseInt(e.target.value); });
 
 document.getElementById('clear-btn').addEventListener('click', () => {
   state.strokes.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-  ctx.fillStyle = '#f5f0e8';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#f5f0e8'; ctx.fillRect(0, 0, canvas.width, canvas.height);
   aiCtx.clearRect(0, 0, aiCanvas.width, aiCanvas.height);
-  state.strokeCount = 0;
-  state.totalPixelsMoved = 0;
-  state.recentPositions = [];
-  state.strokesSinceLastAI = 0;
-  if (ai.isLive) {
-    triggerAIResponse('The artist just cleared the entire canvas. It\'s a blank cream surface again. React to this — the loss, the fresh start.');
-  } else {
-    addMessage('ai', pickRandom(clearReactions));
-  }
+  state.strokeCount = 0; state.recentPositions = []; state.strokesSinceLastAI = 0;
 });
-
 document.getElementById('undo-btn').addEventListener('click', () => {
   if (state.strokes.length > 0) ctx.putImageData(state.strokes.pop(), 0, 0);
 });
@@ -1045,14 +783,17 @@ document.getElementById('undo-btn').addEventListener('click', () => {
 // ─── Chat System ───
 const messagesEl = document.getElementById('chat-messages');
 const statusText = document.getElementById('status-text');
+const aiActivity = document.getElementById('ai-activity');
 
 function addMessage(type, text) {
   const div = document.createElement('div');
   div.className = `message ${type}`;
   if (type === 'ai') {
-    div.innerHTML = `<div class="label">Observer</div>${text}`;
+    div.innerHTML = `<div class="label">AI</div>${text}`;
   } else if (type === 'drawing-action') {
-    div.innerHTML = `<div class="label">Observer [drawing]</div>${text}`;
+    div.textContent = text;
+  } else if (type === 'user') {
+    div.textContent = text;
   } else {
     div.textContent = text;
   }
@@ -1062,199 +803,147 @@ function addMessage(type, text) {
 
 function showTyping() {
   const existing = messagesEl.querySelector('.typing-indicator');
-  if (existing) return existing;
+  if (existing) return;
   const typing = document.createElement('div');
   typing.className = 'typing-indicator';
   typing.innerHTML = '<span></span><span></span><span></span>';
   messagesEl.appendChild(typing);
   messagesEl.scrollTop = messagesEl.scrollHeight;
-  return typing;
 }
-
 function removeTyping() {
   const t = messagesEl.querySelector('.typing-indicator');
   if (t) t.remove();
 }
 
-function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function showAIActivity() {
+  aiActivity.classList.add('visible');
+}
+function hideAIActivity() {
+  aiActivity.classList.remove('visible');
+}
 
 function updateModeBadge() {
   const badge = document.getElementById('mode-badge');
-  if (ai.isLive) {
-    badge.className = 'live';
-    badge.id = 'mode-badge';
-    badge.textContent = 'live — claude vision';
-  } else {
-    badge.className = 'offline';
-    badge.id = 'mode-badge';
-    badge.textContent = 'offline mode';
-  }
+  badge.className = ai.isLive ? 'live' : 'offline';
+  badge.id = 'mode-badge';
+  badge.textContent = ai.isLive ? 'live — claude vision' : 'offline';
 }
 
-// ─── AI Response Scheduling ───
-// Debounce: wait for a pause in drawing before sending to API
-function scheduleAIResponse() {
-  if (!ai.isLive) {
-    maybeOfflineComment();
-    return;
-  }
+// ─── Autonomous Drawing (silent, no chat messages) ───
+function scheduleAutonomousDraw() {
+  if (!ai.isLive || ai.isRequesting) return;
 
   clearTimeout(ai.snapshotDebounceTimer);
 
-  // After every 2-3 strokes or a 2s pause, send snapshot
-  const strokeThreshold = 2 + Math.floor(Math.random() * 2);
+  const threshold = 3 + Math.floor(Math.random() * 3); // every 3-5 strokes
 
-  if (state.strokesSinceLastAI >= strokeThreshold) {
-    ai.snapshotDebounceTimer = setTimeout(() => triggerAIResponse(), 600);
+  if (state.strokesSinceLastAI >= threshold) {
+    ai.snapshotDebounceTimer = setTimeout(() => doAutonomousDraw(), 800);
   } else {
+    // Also trigger after a pause
     ai.snapshotDebounceTimer = setTimeout(() => {
-      if (state.strokesSinceLastAI > 0) triggerAIResponse();
-    }, 2500);
+      if (state.strokesSinceLastAI > 0) doAutonomousDraw();
+    }, 3000);
   }
 }
 
-async function triggerAIResponse(contextOverride) {
-  if (ai.isRequesting) return;
+async function doAutonomousDraw() {
+  if (ai.isRequesting || !ai.isLive) return;
+  if (state.strokeCount < 3) return; // let them get started
 
-  const now = Date.now();
-  if (now - state.lastCommentTime < 3000) return;
-
-  state.lastCommentTime = now;
   state.strokesSinceLastAI = 0;
-
-  statusText.textContent = 'analyzing canvas...';
-  const typingEl = showTyping();
+  showAIActivity();
+  statusText.textContent = 'drawing...';
 
   const imageBase64 = ai.captureCanvas();
+  const context = `[AUTONOMOUS MODE] The artist has made new strokes using ${state.brush} in ${state.color}. Total strokes: ${state.strokeCount}. Respond ONLY with <draw> commands. No text.`;
 
-  let context = contextOverride;
-  if (!context) {
-    const contexts = [
-      `The artist has made ${state.strokeCount} strokes total. They're using the ${state.brush} brush in ${state.color}. React to what you see.`,
-      `New marks on the canvas. Current tool: ${state.brush}. What's emerging?`,
-      `The drawing is evolving. ${state.strokeCount} strokes so far, using ${state.brush}. What do you notice now?`,
-      `Fresh strokes just landed. The artist is working with ${state.brush} in ${state.color}. Observe.`,
-    ];
-    context = pickRandom(contexts);
+  const response = await ai.callAPI(imageBase64, context, false);
+
+  hideAIActivity();
+  statusText.textContent = 'ready';
+
+  if (response) {
+    const didDraw = ai.executeDrawCommands(response);
+    if (didDraw) {
+      // Small subtle log in chat — just a timestamp-style note
+      addMessage('drawing-action', `AI drew on canvas`);
+    }
   }
+}
 
-  const response = await ai.callAPI(imageBase64, context);
+// ─── Chat Input (user-directed drawing) ───
+const chatInput = document.getElementById('chat-input');
+const chatSend = document.getElementById('chat-send');
+
+// Auto-resize textarea
+chatInput.addEventListener('input', () => {
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+});
+
+async function sendChatMessage() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+  if (!ai.isLive) {
+    addMessage('system', 'Connect an API key to chat with the AI.');
+    return;
+  }
+  if (ai.isRequesting) return;
+
+  addMessage('user', text);
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  chatSend.disabled = true;
+
+  showTyping();
+  showAIActivity();
+  statusText.textContent = 'drawing...';
+
+  const imageBase64 = ai.captureCanvas();
+  const context = `[CHAT MODE] The user says: "${text}"\n\nLook at the canvas and respond to their request. Draw what they ask for, placing it thoughtfully on the canvas. Include brief text acknowledgment + <draw> commands.`;
+
+  const response = await ai.callAPI(imageBase64, context, true);
 
   removeTyping();
-  statusText.textContent = 'watching your canvas...';
+  hideAIActivity();
+  statusText.textContent = 'ready';
+  chatSend.disabled = false;
 
   if (response) {
     const didDraw = ai.executeDrawCommands(response);
     const cleanText = ai.cleanTextForDisplay(response);
 
     if (cleanText) {
-      if (didDraw) {
-        addMessage('drawing-action', cleanText);
-      } else {
-        addMessage('ai', cleanText);
-      }
+      addMessage('ai', cleanText);
     }
-  } else if (!ai.isLive) {
-    // Fallback already handled
-  }
-}
-
-// ─── Idle detection for AI ───
-let idleTimer = null;
-function resetIdleTimer() {
-  clearTimeout(idleTimer);
-  idleTimer = setTimeout(() => {
-    if (state.strokeCount > 3) {
-      const now = Date.now();
-      if (now - state.lastCommentTime > 10000) {
-        if (ai.isLive) {
-          triggerAIResponse('The artist has paused and stopped drawing. They seem to be contemplating their work. Comment on the current state of the canvas — what you see, the overall composition, the feeling.');
-        } else {
-          state.lastCommentTime = now;
-          addMessage('ai', pickRandom(idleComments));
-        }
-      }
+    if (didDraw && !cleanText) {
+      addMessage('drawing-action', 'AI drew on canvas');
     }
-  }, 12000);
-}
-
-canvas.addEventListener('pointermove', resetIdleTimer);
-canvas.addEventListener('pointerdown', resetIdleTimer);
-
-// ─── Offline Fallback Comment Banks ───
-const earlyComments = [
-  "First marks on a blank surface. There's something brave about that.",
-  "Interesting... you started from the center. Most people do.",
-  "I see movement. Confidence, even. Keep going.",
-  "A beginning. Every great piece starts with a mark just like this.",
-];
-
-const midComments = [
-  "Something is forming here. I can almost see it.",
-  "The rhythm of your strokes is changing. You're finding something.",
-  "The negative space is speaking as loudly as the marks.",
-  "There's a tension between your fast and slow strokes. I like it.",
-  "The density is building. It wants to be something.",
-  "I see layers forming. Depth.",
-];
-
-const lateComments = [
-  "This has evolved significantly. I can see the journey in the layers.",
-  "Complex. The early simplicity has given way to something richer.",
-  "This is becoming a conversation between you and the canvas.",
-];
-
-const idleComments = [
-  "Taking a pause? Sometimes stepping back reveals more than leaning in.",
-  "The canvas is waiting. No rush.",
-  "Stillness is part of the process too.",
-  "Looking at what you've made? Good. Really look.",
-];
-
-const clearReactions = [
-  "A clean slate. The ghost of what was before still lingers in my memory.",
-  "Gone. But I remember what was there. Do you?",
-  "Blank canvas again. Fearless.",
-  "Starting over is its own form of creation.",
-];
-
-function maybeOfflineComment() {
-  const now = Date.now();
-  if (now - state.lastCommentTime < 4000) return;
-
-  let comment = null;
-  const chance = Math.random();
-
-  if (state.strokeCount <= 5 && chance < 0.5) {
-    comment = pickRandom(earlyComments);
-  } else if (state.strokeCount > 5 && state.strokeCount <= 25 && chance < 0.3) {
-    comment = pickRandom(midComments);
-  } else if (state.strokeCount > 25 && chance < 0.25) {
-    comment = pickRandom(lateComments);
-  }
-
-  if (comment) {
-    state.lastCommentTime = now;
-    setTimeout(() => addMessage('ai', comment), 500 + Math.random() * 800);
+  } else {
+    addMessage('system', 'Failed to get response. Try again.');
   }
 }
+
+chatSend.addEventListener('click', sendChatMessage);
+chatInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMessage();
+  }
+});
 
 // ─── API Key Modal ───
 document.getElementById('api-submit-btn').addEventListener('click', async () => {
   const key = document.getElementById('api-key-input').value.trim();
   const errorEl = document.getElementById('api-error');
 
-  if (!key) {
-    errorEl.textContent = 'Please enter your API key.';
-    errorEl.style.display = 'block';
-    return;
-  }
+  if (!key) { errorEl.textContent = 'Please enter your API key.'; errorEl.style.display = 'block'; return; }
 
   errorEl.style.display = 'none';
   document.getElementById('api-submit-btn').textContent = 'Connecting...';
-
-  // Test the key with a simple request
   ai.apiKey = key;
+
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -1275,19 +964,16 @@ document.getElementById('api-submit-btn').addEventListener('click', async () => 
       ai.isLive = true;
       document.getElementById('api-modal').classList.add('hidden');
       updateModeBadge();
-      addMessage('system', 'Claude vision connected. The AI can now see your canvas in real-time.');
-      setTimeout(() => {
-        addMessage('ai', "I can see your canvas now. It's a beautiful blank cream surface — full of potential. Go ahead, make your first mark. I'm watching.");
-      }, 600);
+      addMessage('system', 'Connected. Draw to start — the AI will join in. Type below to direct it.');
     } else {
       const err = await resp.json().catch(() => ({}));
-      errorEl.textContent = err.error?.message || `Connection failed (${resp.status}). Check your API key.`;
+      errorEl.textContent = err.error?.message || `Connection failed (${resp.status}).`;
       errorEl.style.display = 'block';
       document.getElementById('api-submit-btn').textContent = 'Connect to Claude';
       ai.apiKey = null;
     }
   } catch (e) {
-    errorEl.textContent = 'Network error. Check your connection and try again.';
+    errorEl.textContent = 'Network error.';
     errorEl.style.display = 'block';
     document.getElementById('api-submit-btn').textContent = 'Connect to Claude';
     ai.apiKey = null;
@@ -1298,8 +984,7 @@ document.getElementById('skip-btn').addEventListener('click', () => {
   document.getElementById('api-modal').classList.add('hidden');
   ai.isLive = false;
   updateModeBadge();
-  addMessage('ai', "The canvas is yours. I'm here, watching. Draw something — anything — and I'll be right here observing.");
-  setTimeout(() => addMessage('system', 'Offline mode — scripted responses. Add an API key to enable real AI vision.'), 1200);
+  addMessage('system', 'Drawing without AI. Connect an API key to enable collaboration.');
 });
 
 document.getElementById('api-key-input').addEventListener('keydown', (e) => {
@@ -1308,28 +993,15 @@ document.getElementById('api-key-input').addEventListener('keydown', (e) => {
 
 // ─── Keyboard shortcuts ───
 document.addEventListener('keydown', (e) => {
-  // Don't capture when typing in input
-  if (e.target.tagName === 'INPUT') return;
-
-  if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
-    e.preventDefault();
-    document.getElementById('undo-btn').click();
-  }
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'z' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); document.getElementById('undo-btn').click(); }
   if (e.key === '1') document.querySelector('[data-brush="pencil"]').click();
   if (e.key === '2') document.querySelector('[data-brush="ink"]').click();
   if (e.key === '3') document.querySelector('[data-brush="marker"]').click();
   if (e.key === '4') document.querySelector('[data-brush="spray"]').click();
   if (e.key === '5') document.querySelector('[data-brush="eraser"]').click();
-  if (e.key === '[') {
-    const slider = document.getElementById('size-slider');
-    slider.value = Math.max(1, parseInt(slider.value) - 3);
-    state.size = parseInt(slider.value);
-  }
-  if (e.key === ']') {
-    const slider = document.getElementById('size-slider');
-    slider.value = Math.min(60, parseInt(slider.value) + 3);
-    state.size = parseInt(slider.value);
-  }
+  if (e.key === '[') { const s = document.getElementById('size-slider'); s.value = Math.max(1, parseInt(s.value) - 3); state.size = parseInt(s.value); }
+  if (e.key === ']') { const s = document.getElementById('size-slider'); s.value = Math.min(60, parseInt(s.value) + 3); state.size = parseInt(s.value); }
 });
 
 </script>
