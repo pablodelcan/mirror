@@ -515,11 +515,31 @@ RULES:
   },
 
   executeDrawCommands(text) {
+    // Try multiple patterns — model may or may not use <draw> tags
+    let jsonStr = null;
+
+    // Pattern 1: <draw>...</draw> tags
     const drawMatch = text.match(/<draw>([\s\S]*?)<\/draw>/);
-    if (!drawMatch) return false;
+    if (drawMatch) {
+      jsonStr = drawMatch[1];
+    }
+
+    // Pattern 2: ```json ... ``` code block
+    if (!jsonStr) {
+      const codeMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
+      if (codeMatch) jsonStr = codeMatch[1];
+    }
+
+    // Pattern 3: raw {"actions": [...]} anywhere in text
+    if (!jsonStr) {
+      const rawMatch = text.match(/(\{"actions"\s*:\s*\[[\s\S]*\][\s\S]*?\})/);
+      if (rawMatch) jsonStr = rawMatch[1];
+    }
+
+    if (!jsonStr) return false;
 
     try {
-      const drawData = JSON.parse(drawMatch[1]);
+      const drawData = JSON.parse(jsonStr.trim());
       if (!drawData.actions || !Array.isArray(drawData.actions)) return false;
 
       aiCtx.save();
@@ -619,7 +639,15 @@ RULES:
   },
 
   cleanTextForDisplay(text) {
-    return text.replace(/<draw>[\s\S]*?<\/draw>/g, '').trim();
+    let cleaned = text;
+    // Strip <draw>...</draw>
+    cleaned = cleaned.replace(/<draw>[\s\S]*?<\/draw>/g, '');
+    // Strip ```json...```
+    cleaned = cleaned.replace(/```(?:json)?\s*[\s\S]*?```/g, '');
+    // Strip raw {"actions": [...]}
+    cleaned = cleaned.replace(/\{"actions"\s*:\s*\[[\s\S]*\][\s\S]*?\}/g, '');
+    // Clean up leftover whitespace
+    return cleaned.replace(/\n{3,}/g, '\n').trim();
   },
 };
 
