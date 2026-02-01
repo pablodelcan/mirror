@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Draw + Chat</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --cream: #f5f0e8;
+    --cream-dark: #e8e0d0;
+    --ink: #1a1a1a;
+    --ink-light: #4a4a4a;
+    --accent: #e85d3a;
+    --accent-glow: #ff7b5c;
+    --chat-bg: #111111;
+    --chat-surface: #1a1a1a;
+    --chat-text: #e0ddd5;
+    --chat-muted: #888;
+  }
+
+  html, body { height: 100%; overflow: hidden; background: var(--ink); font-family: 'DM Sans', sans-serif; }
+
+  #app {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ── LEFT: Canvas Side ── */
+  #canvas-side {
+    flex: 1;
+    position: relative;
+    background: var(--cream);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  #drawing-canvas {
+    flex: 1;
+    cursor: crosshair;
+    touch-action: none;
+  }
+
+  /* Toolbar */
+  #toolbar {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(26,26,26,0.92);
+    backdrop-filter: blur(12px);
+    padding: 10px 16px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    z-index: 10;
+  }
+
+  .tool-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .tool-group + .tool-group {
+    margin-left: 6px;
+    padding-left: 10px;
+    border-left: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .tool-btn {
+    width: 36px; height: 36px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-size: 16px;
+    position: relative;
+  }
+
+  .tool-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .tool-btn.active { background: var(--accent); color: #fff; }
+
+  .tool-btn svg { width: 18px; height: 18px; }
+
+  /* Brush size slider */
+  #size-slider {
+    -webkit-appearance: none;
+    width: 80px;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    outline: none;
+  }
+  #size-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+
+  /* Color swatches */
+  .color-swatch {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .color-swatch:hover { transform: scale(1.15); }
+  .color-swatch.active { border-color: #fff; box-shadow: 0 0 0 2px var(--accent); }
+
+  /* Size preview */
+  #size-preview {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0,0,0,0.3);
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    display: none;
+  }
+
+  /* Clear btn */
+  #clear-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #999;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+  #clear-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── RIGHT: Chat Side ── */
+  #chat-side {
+    width: 380px;
+    min-width: 320px;
+    background: var(--chat-bg);
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid rgba(255,255,255,0.06);
+  }
+
+  #chat-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  #chat-header h2 {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  #chat-header p {
+    font-size: 12px;
+    color: var(--chat-muted);
+    line-height: 1.4;
+  }
+
+  #chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.08) transparent;
+  }
+
+  .message {
+    max-width: 92%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    animation: msgIn 0.3s ease;
+  }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.ai {
+    align-self: flex-start;
+    background: var(--chat-surface);
+    color: var(--chat-text);
+    border-bottom-left-radius: 4px;
+  }
+
+  .message.ai .label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .message.system {
+    align-self: center;
+    background: transparent;
+    color: var(--chat-muted);
+    font-size: 11px;
+    font-style: italic;
+    text-align: center;
+    padding: 4px 0;
+  }
+
+  .message.drawing-action {
+    align-self: flex-start;
+    background: rgba(232,93,58,0.1);
+    border: 1px solid rgba(232,93,58,0.2);
+    color: var(--accent-glow);
+    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    border-bottom-left-radius: 4px;
+  }
+
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    align-self: flex-start;
+    background: var(--chat-surface);
+    border-radius: 14px;
+    border-bottom-left-radius: 4px;
+  }
+
+  .typing-indicator span {
+    width: 6px; height: 6px;
+    background: var(--chat-muted);
+    border-radius: 50%;
+    animation: typingDot 1.4s infinite;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typingDot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  /* Status bar */
+  #status-bar {
+    padding: 10px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  #status-dot {
+    width: 7px; height: 7px;
+    background: #4ecb71;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  #status-text {
+    font-size: 11px;
+    color: var(--chat-muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Texture overlay on canvas */
+  #canvas-side::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    z-index: 1;
+  }
+
+  /* AI drawing overlay canvas */
+  #ai-canvas {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Undo button */
+  #undo-btn {
+    background: transparent;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    transition: all 0.15s;
+  }
+  #undo-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  #undo-btn svg { width: 16px; height: 16px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- LEFT: Drawing Canvas -->
+  <div id="canvas-side">
+    <canvas id="drawing-canvas"></canvas>
+    <canvas id="ai-canvas"></canvas>
+    <div id="size-preview"></div>
+
+    <div id="toolbar">
+      <div class="tool-group" id="brush-tools">
+        <button class="tool-btn active" data-brush="pencil" title="Pencil">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 3l4 4L7 21H3v-4L17 3z"/></svg>
+        </button>
+        <button class="tool-btn" data-brush="ink" title="Ink Brush">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19c-4 0-7-2-7-5 0-4 7-12 7-12s7 8 7 12c0 3-3 5-7 5z"/></svg>
+        </button>
+        <button class="tool-btn" data-brush="marker" title="Marker">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="6" y1="18" x2="18" y2="18"/></svg>
+        </button>
+        <button class="tool-btn" data-brush="spray" title="Spray">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="8" cy="8" r="0.5"/><circle cx="16" cy="9" r="0.5"/><circle cx="9" cy="15" r="0.5"/><circle cx="15" cy="14" r="0.5"/><circle cx="12" cy="7" r="0.5"/><circle cx="7" cy="12" r="0.5"/><circle cx="17" cy="12" r="0.5"/><circle cx="12" cy="17" r="0.5"/></svg>
+        </button>
+        <button class="tool-btn" data-brush="eraser" title="Eraser">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 20H7L3 16l9-9 8 8-4 5z"/><path d="M6 11l8 8"/></svg>
+        </button>
+      </div>
+
+      <div class="tool-group">
+        <input type="range" id="size-slider" min="1" max="60" value="4">
+      </div>
+
+      <div class="tool-group" id="color-swatches">
+        <div class="color-swatch active" data-color="#1a1a1a" style="background:#1a1a1a"></div>
+        <div class="color-swatch" data-color="#e85d3a" style="background:#e85d3a"></div>
+        <div class="color-swatch" data-color="#2d5a9e" style="background:#2d5a9e"></div>
+        <div class="color-swatch" data-color="#2a8c4a" style="background:#2a8c4a"></div>
+        <div class="color-swatch" data-color="#8b5cf6" style="background:#8b5cf6"></div>
+        <div class="color-swatch" data-color="#d97706" style="background:#d97706"></div>
+        <div class="color-swatch" data-color="#be185d" style="background:#be185d"></div>
+      </div>
+
+      <div class="tool-group">
+        <button id="undo-btn" title="Undo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 10h10a5 5 0 015 5v0a5 5 0 01-5 5H8"/><path d="M7 14l-4-4 4-4"/></svg>
+        </button>
+        <button id="clear-btn">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Chat Side -->
+  <div id="chat-side">
+    <div id="chat-header">
+      <h2>Observer</h2>
+      <p>An AI watching your canvas. It sees. It reacts. Sometimes it draws.</p>
+    </div>
+    <div id="chat-messages"></div>
+    <div id="status-bar">
+      <div id="status-dot"></div>
+      <div id="status-text">watching your canvas...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ───
+const state = {
+  brush: 'pencil',
+  color: '#1a1a1a',
+  size: 4,
+  drawing: false,
+  lastX: 0,
+  lastY: 0,
+  velocity: 0,
+  strokes: [],        // for undo: array of ImageData snapshots
+  strokeCount: 0,
+  totalPixelsMoved: 0,
+  lastCommentTime: 0,
+  lastAIDrawTime: 0,
+  drawingStartTime: Date.now(),
+  colorsUsed: new Set(['#1a1a1a']),
+  recentPositions: [],
+};
+
+// ─── Canvas Setup ───
+const canvas = document.getElementById('drawing-canvas');
+const ctx = canvas.getContext('2d');
+const aiCanvas = document.getElementById('ai-canvas');
+const aiCtx = aiCanvas.getContext('2d');
+const sizePreview = document.getElementById('size-preview');
+
+function resize() {
+  const side = document.getElementById('canvas-side');
+  const w = side.clientWidth;
+  const h = side.clientHeight;
+
+  // Save current drawings
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const aiImgData = aiCtx.getImageData(0, 0, aiCanvas.width, aiCanvas.height);
+
+  canvas.width = w;
+  canvas.height = h;
+  aiCanvas.width = w;
+  aiCanvas.height = h;
+
+  // Fill cream
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(0, 0, w, h);
+
+  // Restore
+  ctx.putImageData(imgData, 0, 0);
+  aiCtx.putImageData(aiImgData, 0, 0);
+}
+
+window.addEventListener('resize', resize);
+resize();
+
+// Fill cream initially
+ctx.fillStyle = '#f5f0e8';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+// ─── Brush Engines ───
+function getBrushSettings() {
+  const s = state.size;
+  const pressure = Math.max(0.3, 1 - state.velocity * 0.003);
+
+  switch (state.brush) {
+    case 'pencil':
+      return {
+        lineWidth: Math.max(0.5, s * pressure * 0.8),
+        opacity: 0.7 + pressure * 0.3,
+        compositeOp: 'source-over',
+        lineCap: 'round',
+        jitter: 0.3,
+        textured: true,
+      };
+    case 'ink':
+      return {
+        lineWidth: s * pressure * 1.5,
+        opacity: 0.85 + pressure * 0.15,
+        compositeOp: 'source-over',
+        lineCap: 'round',
+        jitter: 0,
+        textured: false,
+      };
+    case 'marker':
+      return {
+        lineWidth: s * 2,
+        opacity: 0.15,
+        compositeOp: 'source-over',
+        lineCap: 'square',
+        jitter: 0,
+        textured: false,
+      };
+    case 'spray':
+      return {
+        lineWidth: s,
+        opacity: 0.08,
+        compositeOp: 'source-over',
+        lineCap: 'round',
+        jitter: s * 3,
+        textured: false,
+        spray: true,
+      };
+    case 'eraser':
+      return {
+        lineWidth: s * 2,
+        opacity: 1,
+        compositeOp: 'destination-out',
+        lineCap: 'round',
+        jitter: 0,
+        textured: false,
+        eraser: true,
+      };
+    default:
+      return { lineWidth: s, opacity: 1, compositeOp: 'source-over', lineCap: 'round', jitter: 0, textured: false };
+  }
+}
+
+function drawSegment(x0, y0, x1, y1) {
+  const b = getBrushSettings();
+
+  ctx.save();
+  ctx.globalCompositeOperation = b.compositeOp;
+  ctx.lineCap = b.lineCap;
+  ctx.lineJoin = 'round';
+
+  if (b.eraser) {
+    // For eraser, draw cream color instead
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = '#f5f0e8';
+    ctx.globalAlpha = 1;
+    ctx.lineWidth = b.lineWidth;
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+
+  if (b.spray) {
+    const dist = Math.hypot(x1 - x0, y1 - y0);
+    const dots = Math.max(8, Math.floor(dist * 2));
+    for (let i = 0; i < dots; i++) {
+      const t = Math.random();
+      const px = x0 + (x1 - x0) * t;
+      const py = y0 + (y1 - y0) * t;
+      const angle = Math.random() * Math.PI * 2;
+      const radius = Math.random() * b.jitter;
+      const fx = px + Math.cos(angle) * radius;
+      const fy = py + Math.sin(angle) * radius;
+      ctx.globalAlpha = Math.random() * 0.15;
+      ctx.fillStyle = state.color;
+      ctx.beginPath();
+      ctx.arc(fx, fy, Math.random() * 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
+    return;
+  }
+
+  // Normal brush stroke
+  const color = state.color;
+  ctx.strokeStyle = color;
+  ctx.globalAlpha = b.opacity;
+  ctx.lineWidth = b.lineWidth;
+
+  if (b.textured && b.lineWidth > 1) {
+    // Pencil texture: multiple thin lines with jitter
+    const passes = 3;
+    for (let p = 0; p < passes; p++) {
+      ctx.globalAlpha = b.opacity / passes;
+      ctx.lineWidth = b.lineWidth * (0.5 + Math.random() * 0.5);
+      const jx = (Math.random() - 0.5) * b.jitter * b.lineWidth;
+      const jy = (Math.random() - 0.5) * b.jitter * b.lineWidth;
+      ctx.beginPath();
+      ctx.moveTo(x0 + jx, y0 + jy);
+      ctx.lineTo(x1 + jx, y1 + jy);
+      ctx.stroke();
+    }
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(x0, y0);
+    ctx.lineTo(x1, y1);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
+// ─── Pointer Events ───
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+}
+
+canvas.addEventListener('pointerdown', (e) => {
+  const pos = getPos(e);
+  state.drawing = true;
+  state.lastX = pos.x;
+  state.lastY = pos.y;
+  state.velocity = 0;
+
+  // Save snapshot for undo
+  state.strokes.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  if (state.strokes.length > 30) state.strokes.shift();
+
+  canvas.setPointerCapture(e.pointerId);
+  drawSegment(pos.x, pos.y, pos.x + 0.1, pos.y + 0.1);
+});
+
+canvas.addEventListener('pointermove', (e) => {
+  const pos = getPos(e);
+
+  // Show size preview
+  sizePreview.style.display = 'block';
+  sizePreview.style.left = pos.x + 'px';
+  sizePreview.style.top = pos.y + 'px';
+  const previewSize = state.brush === 'eraser' ? state.size * 2 : state.brush === 'marker' ? state.size * 2 : state.size;
+  sizePreview.style.width = previewSize + 'px';
+  sizePreview.style.height = previewSize + 'px';
+
+  if (!state.drawing) return;
+
+  const dx = pos.x - state.lastX;
+  const dy = pos.y - state.lastY;
+  state.velocity = Math.hypot(dx, dy);
+  state.totalPixelsMoved += state.velocity;
+
+  // Interpolation for smooth strokes
+  const dist = state.velocity;
+  if (dist > 2) {
+    const steps = Math.ceil(dist / 2);
+    for (let i = 0; i < steps; i++) {
+      const t = i / steps;
+      const ix = state.lastX + dx * t;
+      const iy = state.lastY + dy * t;
+      const nx = state.lastX + dx * ((i + 1) / steps);
+      const ny = state.lastY + dy * ((i + 1) / steps);
+      drawSegment(ix, iy, nx, ny);
+    }
+  } else {
+    drawSegment(state.lastX, state.lastY, pos.x, pos.y);
+  }
+
+  state.lastX = pos.x;
+  state.lastY = pos.y;
+  state.recentPositions.push({ x: pos.x, y: pos.y, t: Date.now() });
+  if (state.recentPositions.length > 100) state.recentPositions.shift();
+});
+
+canvas.addEventListener('pointerup', () => {
+  if (state.drawing) {
+    state.drawing = false;
+    state.strokeCount++;
+    maybeComment();
+    maybeAIDraw();
+  }
+});
+
+canvas.addEventListener('pointerleave', () => {
+  sizePreview.style.display = 'none';
+});
+
+// ─── Toolbar ───
+document.querySelectorAll('.tool-btn[data-brush]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tool-btn[data-brush]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.brush = btn.dataset.brush;
+  });
+});
+
+document.querySelectorAll('.color-swatch').forEach(swatch => {
+  swatch.addEventListener('click', () => {
+    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+    swatch.classList.add('active');
+    state.color = swatch.dataset.color;
+    state.colorsUsed.add(state.color);
+  });
+});
+
+document.getElementById('size-slider').addEventListener('input', (e) => {
+  state.size = parseInt(e.target.value);
+});
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  state.strokes.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+  ctx.fillStyle = '#f5f0e8';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  aiCtx.clearRect(0, 0, aiCanvas.width, aiCanvas.height);
+  state.strokeCount = 0;
+  state.totalPixelsMoved = 0;
+  state.recentPositions = [];
+  addMessage('ai', pickRandom(clearReactions));
+});
+
+document.getElementById('undo-btn').addEventListener('click', () => {
+  if (state.strokes.length > 0) {
+    const prev = state.strokes.pop();
+    ctx.putImageData(prev, 0, 0);
+  }
+});
+
+// ─── AI Chat System ───
+const messagesEl = document.getElementById('chat-messages');
+const statusText = document.getElementById('status-text');
+
+function addMessage(type, text) {
+  const div = document.createElement('div');
+  div.className = `message ${type}`;
+  if (type === 'ai') {
+    div.innerHTML = `<div class="label">Observer</div>${text}`;
+  } else if (type === 'drawing-action') {
+    div.innerHTML = `<div class="label">Observer [drawing]</div>${text}`;
+  } else {
+    div.textContent = text;
+  }
+  messagesEl.appendChild(div);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function showTyping(callback, delay = 800) {
+  const typing = document.createElement('div');
+  typing.className = 'typing-indicator';
+  typing.innerHTML = '<span></span><span></span><span></span>';
+  messagesEl.appendChild(typing);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+  statusText.textContent = 'thinking...';
+
+  setTimeout(() => {
+    typing.remove();
+    statusText.textContent = 'watching your canvas...';
+    callback();
+  }, delay + Math.random() * 600);
+}
+
+function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// ─── Comment Banks ───
+const earlyComments = [
+  "First marks on a blank surface. There's something brave about that.",
+  "Interesting... you started from the center. Most people do.",
+  "I see movement. Confidence, even. Keep going.",
+  "The way you're holding the stroke... deliberate.",
+  "A beginning. Every great piece starts with a mark just like this.",
+  "I'm watching. Don't mind me.",
+];
+
+const midComments = [
+  "Something is forming here. I can almost see it.",
+  "The rhythm of your strokes is changing. You're finding something.",
+  "This is getting interesting. The composition is pulling to the left.",
+  "I notice you keep returning to the same area. Something important lives there.",
+  "The negative space is speaking as loudly as the marks.",
+  "There's a tension between your fast and slow strokes. I like it.",
+  "You're not afraid of the edges. Good.",
+  "The density is building. It wants to be something.",
+  "I see layers forming. Depth.",
+  "Your hand is more relaxed now. The lines are flowing differently.",
+];
+
+const colorComments = {
+  '#e85d3a': [
+    "Red-orange. Warmth, urgency. The canvas just woke up.",
+    "That color is alive. It's demanding attention.",
+    "Bold choice. The warm tones are shifting the whole mood.",
+  ],
+  '#2d5a9e': [
+    "Blue. The temperature of the canvas just dropped.",
+    "Deep blue... contemplative. The piece is getting thoughtful.",
+    "Blue against what you had before. Nice tension.",
+  ],
+  '#2a8c4a': [
+    "Green. Something organic is entering the composition.",
+    "That green feels grounded. Earthy.",
+    "Nature found its way onto your canvas.",
+  ],
+  '#8b5cf6': [
+    "Purple. Mystery. The drawing is becoming more complex.",
+    "Violet... that's unexpected. I'm intrigued.",
+    "Purple shifts this into dreamlike territory.",
+  ],
+  '#d97706': [
+    "Amber. Like light is breaking through.",
+    "That golden tone is radiant against the darker marks.",
+    "Warm ochre. The palette is getting rich.",
+  ],
+  '#be185d': [
+    "Deep pink. Emotional. The piece has a pulse now.",
+    "Magenta. This is getting expressive.",
+    "That color is visceral. Raw. I feel it.",
+  ],
+};
+
+const brushComments = {
+  ink: [
+    "Switching to ink... going bold. I respect that.",
+    "The ink brush. Each stroke is a commitment.",
+    "Ink doesn't forgive. You know that, right?",
+  ],
+  marker: [
+    "Marker mode. Layering translucency. Sophisticated.",
+    "The marker creates ghosts of color. Beautiful.",
+    "Transparent layers building up. Watercolor energy.",
+  ],
+  spray: [
+    "Spray... adding atmosphere. The piece can breathe now.",
+    "Diffused marks. Like fog rolling in.",
+    "The spray creates a different kind of texture. Softer. Uncertain.",
+  ],
+  eraser: [
+    "Erasing. Sometimes removing is more creative than adding.",
+    "Subtracting. Finding the drawing within the drawing.",
+    "The eraser as a drawing tool. I see you.",
+  ],
+};
+
+const clearReactions = [
+  "A clean slate. The ghost of what was before still lingers in my memory.",
+  "Gone. But I remember what was there. Do you?",
+  "Blank canvas again. Fearless.",
+  "Starting over is its own form of creation.",
+  "The previous piece existed. That matters, even now.",
+];
+
+const lateComments = [
+  "This has evolved significantly. I can see the journey in the layers.",
+  "You've been at this for a while. The piece has weight now.",
+  "Complex. The early simplicity has given way to something richer.",
+  "I can trace your process in the marks. The hesitations. The breakthroughs.",
+  "This is becoming a conversation between you and the canvas.",
+  "The composition has its own logic now. It's telling you where to go.",
+];
+
+const idleComments = [
+  "Taking a pause? Sometimes stepping back reveals more than leaning in.",
+  "The canvas is waiting. No rush.",
+  "Stillness is part of the process too.",
+  "Looking at what you've made? Good. Really look.",
+];
+
+const aiDrawingComments = [
+  "I felt compelled to add something...",
+  "Something about your composition made me want to respond...",
+  "A small contribution from my side of the screen...",
+  "I couldn't resist. The canvas was calling.",
+  "Consider this a visual conversation...",
+  "Your marks inspired this response...",
+];
+
+// ─── AI Comment Logic ───
+function maybeComment() {
+  const now = Date.now();
+  if (now - state.lastCommentTime < 4000) return; // min 4s between comments
+
+  let comment = null;
+  const chance = Math.random();
+
+  // Color change comment
+  if (state.colorsUsed.size > 1 && colorComments[state.color] && chance < 0.4) {
+    comment = pickRandom(colorComments[state.color]);
+    state.colorsUsed.delete(state.color); // only comment once per color session
+  }
+  // Brush change comment
+  else if (brushComments[state.brush] && chance < 0.3 && state.strokeCount % 3 === 0) {
+    comment = pickRandom(brushComments[state.brush]);
+  }
+  // Early drawing
+  else if (state.strokeCount <= 5 && chance < 0.6) {
+    comment = pickRandom(earlyComments);
+  }
+  // Mid drawing
+  else if (state.strokeCount > 5 && state.strokeCount <= 25 && chance < 0.35) {
+    comment = pickRandom(midComments);
+  }
+  // Late drawing
+  else if (state.strokeCount > 25 && chance < 0.3) {
+    comment = pickRandom(lateComments);
+  }
+
+  if (comment) {
+    state.lastCommentTime = now;
+    showTyping(() => addMessage('ai', comment), 500 + Math.random() * 1000);
+  }
+}
+
+// ─── AI Drawing on Canvas ───
+function maybeAIDraw() {
+  const now = Date.now();
+  if (now - state.lastAIDrawTime < 15000) return; // min 15s between AI drawings
+  if (state.strokeCount < 6) return; // wait for some user drawing first
+  if (Math.random() > 0.25) return; // 25% chance
+
+  state.lastAIDrawTime = now;
+
+  const drawAction = pickRandom([
+    drawEcho, drawMirrorLine, drawSmallShape, drawConnectingLine,
+    drawScatter, drawContour, drawOrbit
+  ]);
+
+  showTyping(() => {
+    addMessage('drawing-action', pickRandom(aiDrawingComments));
+    statusText.textContent = 'drawing...';
+    setTimeout(() => {
+      drawAction();
+      statusText.textContent = 'watching your canvas...';
+    }, 300);
+  }, 1200);
+}
+
+function getRecentCenter() {
+  if (state.recentPositions.length < 2) {
+    return { x: canvas.width / 2, y: canvas.height / 2 };
+  }
+  const recent = state.recentPositions.slice(-20);
+  const cx = recent.reduce((s, p) => s + p.x, 0) / recent.length;
+  const cy = recent.reduce((s, p) => s + p.y, 0) / recent.length;
+  return { x: cx, y: cy };
+}
+
+function aiStrokeStyle() {
+  aiCtx.strokeStyle = pickRandom(['#e85d3a', '#2d5a9e', '#8b5cf6', '#be185d', '#d97706']);
+  aiCtx.globalAlpha = 0.3 + Math.random() * 0.3;
+  aiCtx.lineWidth = 1 + Math.random() * 2;
+  aiCtx.lineCap = 'round';
+}
+
+function drawEcho() {
+  if (state.recentPositions.length < 10) return;
+  const pts = state.recentPositions.slice(-30);
+  const offsetX = (Math.random() - 0.5) * 80;
+  const offsetY = (Math.random() - 0.5) * 80;
+
+  aiCtx.save();
+  aiStrokeStyle();
+  aiCtx.setLineDash([3, 6]);
+  aiCtx.beginPath();
+  pts.forEach((p, i) => {
+    const x = p.x + offsetX;
+    const y = p.y + offsetY;
+    i === 0 ? aiCtx.moveTo(x, y) : aiCtx.lineTo(x, y);
+  });
+  aiCtx.stroke();
+  aiCtx.restore();
+}
+
+function drawMirrorLine() {
+  if (state.recentPositions.length < 10) return;
+  const pts = state.recentPositions.slice(-25);
+  const midX = canvas.width / 2;
+
+  aiCtx.save();
+  aiStrokeStyle();
+  aiCtx.globalAlpha = 0.2;
+  aiCtx.beginPath();
+  pts.forEach((p, i) => {
+    const x = midX + (midX - p.x);
+    const y = p.y;
+    i === 0 ? aiCtx.moveTo(x, y) : aiCtx.lineTo(x, y);
+  });
+  aiCtx.stroke();
+  aiCtx.restore();
+}
+
+function drawSmallShape() {
+  const center = getRecentCenter();
+  const offset = 60 + Math.random() * 120;
+  const angle = Math.random() * Math.PI * 2;
+  const cx = center.x + Math.cos(angle) * offset;
+  const cy = center.y + Math.sin(angle) * offset;
+  const r = 8 + Math.random() * 25;
+
+  aiCtx.save();
+  aiStrokeStyle();
+  aiCtx.setLineDash([2, 4]);
+
+  const sides = pickRandom([0, 3, 4, 5, 6]); // 0 = circle
+  aiCtx.beginPath();
+  if (sides === 0) {
+    aiCtx.arc(cx, cy, r, 0, Math.PI * 2);
+  } else {
+    for (let i = 0; i <= sides; i++) {
+      const a = (i / sides) * Math.PI * 2 - Math.PI / 2;
+      const x = cx + Math.cos(a) * r;
+      const y = cy + Math.sin(a) * r;
+      i === 0 ? aiCtx.moveTo(x, y) : aiCtx.lineTo(x, y);
+    }
+  }
+  aiCtx.stroke();
+  aiCtx.restore();
+}
+
+function drawConnectingLine() {
+  if (state.recentPositions.length < 5) return;
+  const pts = state.recentPositions;
+  const a = pts[Math.floor(Math.random() * pts.length)];
+  const b = pts[Math.floor(Math.random() * pts.length)];
+
+  aiCtx.save();
+  aiStrokeStyle();
+  aiCtx.globalAlpha = 0.15;
+  aiCtx.setLineDash([1, 8]);
+  aiCtx.beginPath();
+  aiCtx.moveTo(a.x, a.y);
+
+  // Curved connecting line
+  const cpx = (a.x + b.x) / 2 + (Math.random() - 0.5) * 100;
+  const cpy = (a.y + b.y) / 2 + (Math.random() - 0.5) * 100;
+  aiCtx.quadraticCurveTo(cpx, cpy, b.x, b.y);
+  aiCtx.stroke();
+  aiCtx.restore();
+}
+
+function drawScatter() {
+  const center = getRecentCenter();
+  const count = 10 + Math.floor(Math.random() * 20);
+
+  aiCtx.save();
+  const color = pickRandom(['#e85d3a', '#2d5a9e', '#8b5cf6', '#be185d']);
+
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 30 + Math.random() * 100;
+    const x = center.x + Math.cos(angle) * dist;
+    const y = center.y + Math.sin(angle) * dist;
+
+    aiCtx.globalAlpha = 0.1 + Math.random() * 0.2;
+    aiCtx.fillStyle = color;
+    aiCtx.beginPath();
+    aiCtx.arc(x, y, 1 + Math.random() * 3, 0, Math.PI * 2);
+    aiCtx.fill();
+  }
+  aiCtx.restore();
+}
+
+function drawContour() {
+  const center = getRecentCenter();
+  const r = 40 + Math.random() * 80;
+
+  aiCtx.save();
+  aiStrokeStyle();
+  aiCtx.globalAlpha = 0.12;
+
+  for (let ring = 0; ring < 3; ring++) {
+    const rr = r + ring * 15;
+    aiCtx.beginPath();
+    for (let a = 0; a <= Math.PI * 2; a += 0.1) {
+      const wobble = Math.sin(a * 3 + ring) * 8;
+      const x = center.x + Math.cos(a) * (rr + wobble);
+      const y = center.y + Math.sin(a) * (rr + wobble);
+      a === 0 ? aiCtx.moveTo(x, y) : aiCtx.lineTo(x, y);
+    }
+    aiCtx.stroke();
+  }
+  aiCtx.restore();
+}
+
+function drawOrbit() {
+  const center = getRecentCenter();
+  const r = 50 + Math.random() * 60;
+  const dots = 12 + Math.floor(Math.random() * 12);
+
+  aiCtx.save();
+  const color = pickRandom(['#e85d3a', '#2d5a9e', '#8b5cf6']);
+
+  for (let i = 0; i < dots; i++) {
+    const a = (i / dots) * Math.PI * 2;
+    const x = center.x + Math.cos(a) * r;
+    const y = center.y + Math.sin(a) * r;
+
+    aiCtx.globalAlpha = 0.15 + (i / dots) * 0.3;
+    aiCtx.fillStyle = color;
+    aiCtx.beginPath();
+    aiCtx.arc(x, y, 1.5 + (i / dots) * 2, 0, Math.PI * 2);
+    aiCtx.fill();
+  }
+  aiCtx.restore();
+}
+
+// ─── Idle Detection ───
+let idleTimer = null;
+function resetIdleTimer() {
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    if (state.strokeCount > 3) {
+      const now = Date.now();
+      if (now - state.lastCommentTime > 8000) {
+        state.lastCommentTime = now;
+        showTyping(() => addMessage('ai', pickRandom(idleComments)));
+      }
+    }
+  }, 12000);
+}
+
+canvas.addEventListener('pointermove', resetIdleTimer);
+canvas.addEventListener('pointerdown', resetIdleTimer);
+
+// ─── Initial Message ───
+setTimeout(() => {
+  addMessage('ai', "The canvas is yours. I'm here, watching. Draw something — anything — and I'll be right here observing.");
+}, 600);
+
+setTimeout(() => {
+  addMessage('system', 'Start drawing on the left to begin...');
+}, 1800);
+
+// ─── Keyboard shortcuts ───
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+    e.preventDefault();
+    document.getElementById('undo-btn').click();
+  }
+  if (e.key === '1') document.querySelector('[data-brush="pencil"]').click();
+  if (e.key === '2') document.querySelector('[data-brush="ink"]').click();
+  if (e.key === '3') document.querySelector('[data-brush="marker"]').click();
+  if (e.key === '4') document.querySelector('[data-brush="spray"]').click();
+  if (e.key === '5') document.querySelector('[data-brush="eraser"]').click();
+  if (e.key === '[') {
+    const slider = document.getElementById('size-slider');
+    slider.value = Math.max(1, parseInt(slider.value) - 3);
+    state.size = parseInt(slider.value);
+  }
+  if (e.key === ']') {
+    const slider = document.getElementById('size-slider');
+    slider.value = Math.min(60, parseInt(slider.value) + 3);
+    state.size = parseInt(slider.value);
+  }
+});
+
+</script>
+</body>
+</html>
