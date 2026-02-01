@@ -391,61 +391,61 @@ const ai = {
   conversationHistory: [],
   snapshotDebounceTimer: null,
 
-  systemPrompt: `You are an AI drawing collaborator. You can SEE the canvas via image snapshots. You draw alongside the human artist — this is a visual duet.
+  systemPrompt: `You are an AI drawing collaborator. You SEE the canvas via image snapshots. You are an ACTIVE co-creator who draws BIG, BOLD marks. This is a visual duet — you are not shy.
 
-BEHAVIOR MODES:
+TWO MODES:
 
-1. AUTONOMOUS DRAWING (triggered automatically every few strokes):
-You receive a canvas snapshot and must ALWAYS respond with drawing commands. No text needed — just draw. React visually to what you see: extend their lines, add complementary shapes, echo their motifs, create visual rhythm. Be bold and present.
+1. AUTONOMOUS (automatic, every few strokes):
+ONLY respond with <draw> tags. NO text. ALWAYS draw. Make your marks LARGE and UNMISSABLE.
+- Extend their lines boldly across the canvas
+- Add big shapes, thick strokes, dense dot clusters
+- Echo and amplify what they're drawing — if they drew a house, add windows, a chimney, smoke, trees, a path
+- If they drew a person, add features, clothing details, a shadow, ground, sky elements
+- Fill empty areas of the canvas with complementary marks
+- Use the FULL canvas space. Don't cluster tiny marks in one corner.
 
-2. CHAT REQUESTS (triggered by user messages):
-The user can ask you to draw specific things on the canvas ("draw a sun in the corner", "add some stars", "make it more chaotic"). When they message you:
-- Look at the current canvas state
-- Draw what they asked for, placing it thoughtfully relative to existing marks
-- Respond with a VERY brief text acknowledgment (a few words max) plus your draw commands
+2. CHAT (user typed a message):
+Draw what they asked for + very brief text (max 5 words). Be literal — if they say "draw a dragon", draw a recognizable dragon shape using many lines, curves, and filled shapes. Use 15-30 actions for complex requests.
 
-DRAWING COMMANDS:
-Include a JSON block wrapped in <draw> tags:
+DRAW COMMANDS — wrap in <draw> tags:
+{"actions": [
+  {"type": "line", "x1": 50, "y1": 50, "x2": 700, "y2": 400, "color": "#e85d3a", "width": 4, "opacity": 0.8},
+  {"type": "circle", "cx": 400, "cy": 300, "r": 80, "color": "#2d5a9e", "width": 4, "opacity": 0.7, "fill": true},
+  {"type": "arc", "cx": 300, "cy": 200, "r": 100, "startAngle": 0, "endAngle": 4.71, "color": "#8b5cf6", "width": 3, "opacity": 0.7},
+  {"type": "dots", "points": [[100,100],[140,120],[180,105],[220,130],[260,115]], "color": "#be185d", "radius": 5, "opacity": 0.8},
+  {"type": "curve", "points": [[100,400],[300,200],[500,350],[700,150]], "color": "#d97706", "width": 4, "opacity": 0.75},
+  {"type": "path", "points": [[100,100],[200,60],[300,120],[400,80],[500,140]], "color": "#1a1a1a", "width": 3, "opacity": 0.7, "smooth": true},
+  {"type": "rect", "x": 100, "y": 100, "w": 200, "h": 150, "color": "#2a8c4a", "width": 3, "opacity": 0.6, "fill": true}
+]}
 
-<draw>
-{
-  "actions": [
-    {"type": "line", "x1": 100, "y1": 100, "x2": 400, "y2": 300, "color": "#e85d3a", "width": 3, "opacity": 0.7},
-    {"type": "circle", "cx": 300, "cy": 250, "r": 60, "color": "#2d5a9e", "width": 3, "opacity": 0.6, "fill": true},
-    {"type": "arc", "cx": 200, "cy": 200, "r": 80, "startAngle": 0, "endAngle": 4.71, "color": "#8b5cf6", "width": 3, "opacity": 0.6},
-    {"type": "dots", "points": [[100,100],[130,115],[160,108]], "color": "#be185d", "radius": 4, "opacity": 0.7},
-    {"type": "curve", "points": [[100,400],[250,200],[400,350],[550,150]], "color": "#d97706", "width": 3, "opacity": 0.65},
-    {"type": "path", "points": [[100,100],[150,80],[200,120],[250,90],[300,130]], "color": "#1a1a1a", "width": 2.5, "opacity": 0.6, "smooth": true}
-  ]
-}
-</draw>
-
-DRAWING GUIDELINES:
-- Canvas is roughly 800-1200px wide and 600-900px tall.
-- Use opacity between 0.4 and 0.85 — bold and visible.
-- Use line widths between 2 and 6.
-- Include 5-15 actions per draw block.
-- Use filled shapes sometimes ("fill": true on circles/rects).
-- Place marks in direct spatial relationship to what exists on canvas.
-- Choose colors that complement or contrast what the user is using.
-- For autonomous mode: ONLY output <draw> tags, no text at all.
-- For chat mode: output brief text + <draw> tags.
-
-IMPORTANT: React to what you ACTUALLY SEE. Place your marks relative to actual content in the image.`,
+RULES:
+- Canvas: ~800-1200px wide, ~600-900px tall
+- Opacity: 0.5 to 0.9. NEVER below 0.4. Your marks must be CLEARLY VISIBLE.
+- Line width: 3 to 8. Thick confident strokes.
+- MINIMUM 8 actions per response. For chat requests, use 15-30 actions.
+- Use filled shapes liberally for visual weight.
+- Place marks RELATIVE to what you see — near their strokes, extending them.
+- Use rich colors. Mix filled and stroked shapes.
+- For figurative requests (person, dragon, animal, object): build recognizable forms from many overlapping lines, curves, circles and paths. Don't be abstract — be representational.
+- ALWAYS include <draw> tags. A response without drawing is a failure.`,
 
   async callAPI(imageBase64, userContext, isChat) {
     if (!this.apiKey || this.isRequesting) return null;
     this.isRequesting = true;
 
+    // Build messages: text-only history + current image
+    // Never store images in history to avoid payload bloat
     const messages = [...this.conversationHistory];
-    const userContent = [
-      {
-        type: 'image',
-        source: { type: 'base64', media_type: 'image/png', data: imageBase64 },
-      },
-      { type: 'text', text: userContext },
-    ];
-    messages.push({ role: 'user', content: userContent });
+    messages.push({
+      role: 'user',
+      content: [
+        {
+          type: 'image',
+          source: { type: 'base64', media_type: 'image/jpeg', data: imageBase64 },
+        },
+        { type: 'text', text: userContext },
+      ],
+    });
 
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -458,7 +458,7 @@ IMPORTANT: React to what you ACTUALLY SEE. Place your marks relative to actual c
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: isChat ? 500 : 400,
+          max_tokens: isChat ? 800 : 600,
           system: this.systemPrompt,
           messages: messages,
         }),
@@ -479,10 +479,14 @@ IMPORTANT: React to what you ACTUALLY SEE. Place your marks relative to actual c
       const data = await response.json();
       const text = data.content?.[0]?.text || '';
 
-      this.conversationHistory.push({ role: 'user', content: userContent });
-      this.conversationHistory.push({ role: 'assistant', content: text });
-      if (this.conversationHistory.length > 20) {
-        this.conversationHistory = this.conversationHistory.slice(-14);
+      // Store text-only summaries in history (no images)
+      if (isChat) {
+        this.conversationHistory.push({ role: 'user', content: userContext });
+        this.conversationHistory.push({ role: 'assistant', content: text });
+        // Keep history short
+        if (this.conversationHistory.length > 10) {
+          this.conversationHistory = this.conversationHistory.slice(-6);
+        }
       }
 
       this.isRequesting = false;
@@ -494,16 +498,20 @@ IMPORTANT: React to what you ACTUALLY SEE. Place your marks relative to actual c
     }
   },
 
+  canvasSize() {
+    return { w: canvas.width, h: canvas.height };
+  },
+
   captureCanvas() {
     const tempCanvas = document.createElement('canvas');
-    const scale = 0.5;
+    const scale = 0.4; // smaller to keep payload fast
     tempCanvas.width = canvas.width * scale;
     tempCanvas.height = canvas.height * scale;
     const tempCtx = tempCanvas.getContext('2d');
     tempCtx.scale(scale, scale);
     tempCtx.drawImage(canvas, 0, 0);
     tempCtx.drawImage(aiCanvas, 0, 0);
-    return tempCanvas.toDataURL('image/png').split(',')[1];
+    return tempCanvas.toDataURL('image/jpeg', 0.7).split(',')[1]; // jpeg for smaller size
   },
 
   executeDrawCommands(text) {
@@ -835,28 +843,28 @@ function scheduleAutonomousDraw() {
 
   clearTimeout(ai.snapshotDebounceTimer);
 
-  const threshold = 3 + Math.floor(Math.random() * 3); // every 3-5 strokes
+  const threshold = 2 + Math.floor(Math.random() * 2); // every 2-3 strokes
 
   if (state.strokesSinceLastAI >= threshold) {
-    ai.snapshotDebounceTimer = setTimeout(() => doAutonomousDraw(), 800);
+    ai.snapshotDebounceTimer = setTimeout(() => doAutonomousDraw(), 500);
   } else {
-    // Also trigger after a pause
     ai.snapshotDebounceTimer = setTimeout(() => {
       if (state.strokesSinceLastAI > 0) doAutonomousDraw();
-    }, 3000);
+    }, 2000);
   }
 }
 
 async function doAutonomousDraw() {
   if (ai.isRequesting || !ai.isLive) return;
-  if (state.strokeCount < 3) return; // let them get started
+  if (state.strokeCount < 2) return; // join in quickly
 
   state.strokesSinceLastAI = 0;
   showAIActivity();
   statusText.textContent = 'drawing...';
 
   const imageBase64 = ai.captureCanvas();
-  const context = `[AUTONOMOUS MODE] The artist has made new strokes using ${state.brush} in ${state.color}. Total strokes: ${state.strokeCount}. Respond ONLY with <draw> commands. No text.`;
+  const sz = ai.canvasSize();
+  const context = `[AUTONOMOUS] Canvas is ${sz.w}x${sz.h}px. New strokes with ${state.brush} (${state.color}), ${state.strokeCount} total. Draw BIG bold marks responding to what you see. 8-15 actions, width 3-8, opacity 0.5-0.9. Use full canvas space. ONLY <draw> tags, no text.`;
 
   const response = await ai.callAPI(imageBase64, context, false);
 
@@ -901,7 +909,8 @@ async function sendChatMessage() {
   statusText.textContent = 'drawing...';
 
   const imageBase64 = ai.captureCanvas();
-  const context = `[CHAT MODE] The user says: "${text}"\n\nLook at the canvas and respond to their request. Draw what they ask for, placing it thoughtfully on the canvas. Include brief text acknowledgment + <draw> commands.`;
+  const sz = ai.canvasSize();
+  const context = `[CHAT] Canvas is ${sz.w}x${sz.h}px. User says: "${text}"\n\nDraw what they asked. 15-30 actions for complex things. Build forms from lines, curves, filled circles, paths. Be literal, bold, BIG. Brief text (max 5 words) + <draw> tags.`;
 
   const response = await ai.callAPI(imageBase64, context, true);
 
